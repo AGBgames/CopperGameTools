@@ -16,12 +16,7 @@ public class CGTProjFile
         .Replace(" ", ""), line.Split("=")[1].Replace(" ", "")))
         .ToList();
     }
-    
-    public void Test()
-    {
-        //TODO: Sheesh!
-    }
-
+   
     public string KeyFromList(string searchKey, List<CGTProjFileKey> keys)
     {
         foreach (var key in keys)
