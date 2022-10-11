@@ -4,30 +4,36 @@ public class CGTProjBuilder
 {
     public CGTProjFile ProjFile { get; }
 
+
     public CGTProjBuilder(CGTProjFile cgtProjFile)
     {
         ProjFile = cgtProjFile;
     }
 
-    public CGTProjBuilderResultType Build()
+    public CGTProjBuilderResult Build()
     {
         foreach (var error in ProjFile.FileCheck().ResultErrors)
             if (error.IsCritical)
-                return CGTProjBuilderResultType.FailedWithErrs;
+                return new CGTProjBuilderResult(CGTProjBuilderResultType.FailedWithErrors);
 
-        var keys = ProjFile.KeysToList();
-
-        var projNameKey = ProjFile.KeyFromList("projectname", keys);
-
-
-        return CGTProjBuilderResultType.DoneNoErrs;
+        return new CGTProjBuilderResult(CGTProjBuilderResultType.DoneNoErrors);
     }
+}
+
+public class CGTProjBuilderResult
+{
+    public CGTProjBuilderResult(CGTProjBuilderResultType cgtProjBuilderResultType)
+    {
+        ResultType = cgtProjBuilderResultType;
+    }
+
+    public CGTProjBuilderResultType ResultType { get; }
 }
 
 public enum CGTProjBuilderResultType
 {
-    DoneNoErrs,
-    DoneWithErrs,
-    FailedNoErrs,
-    FailedWithErrs
+    DoneNoErrors,
+    DoneWithErrors,
+    FailedNoErrors,
+    FailedWithErrors
 }

@@ -1,29 +1,33 @@
+using System.Collections;
+
 namespace CopperGameTools.Builder;
 
 public class CGTProjFile
 {
-    private readonly FileInfo _sourceFile;
+    public FileInfo SourceFile { get; }
+    public List<CGTProjFileKey> FileKeys { get; }
 
     public CGTProjFile(FileInfo sourceFile)
     {
-        _sourceFile = sourceFile;
+        if (!sourceFile.Exists) 
+            throw new IOException("Source File does not exist!");
+
+        SourceFile = sourceFile;
+        FileKeys = new List<CGTProjFileKey>();
+
+        foreach (var line in File.ReadAllLines(SourceFile.FullName))
+        {
+            if (!line.Contains("=") || line.StartsWith("#")) continue;
+            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1]));
+        }
     }
-    
-    public List<CGTProjFileKey> KeysToList()
+
+    public string KeyGet(string searchKey)
     {
-        return File.ReadAllLines(_sourceFile.FullName)
-        .Select(line => new CGTProjFileKey(line.Split('=')[0]
-        .Replace(" ", ""), line.Split("=")[1].Replace(" ", "")))
-        .ToList();
-    }
-   
-    public string KeyFromList(string searchKey, List<CGTProjFileKey> keys)
-    {
-        foreach (var key in keys)
+        foreach (var key in FileKeys)
         {
             if (key.Key == searchKey) return key.Value;
         }
-
         return "";
     }
 
@@ -33,6 +37,8 @@ public class CGTProjFile
         return new CGTProjFileCheckResult(CGTProjFileCheckResultType.NoErrors, new CGTProjFileCheckError[] {});
     }
 }
+
+#region File Check
 
 public class CGTProjFileCheckResult
 {
@@ -52,6 +58,10 @@ public enum CGTProjFileCheckResultType
     Errors
 }
 
+#endregion File Check
+
+#region File Check Error
+
 public class CGTProjFileCheckError
 {
     public CGTProjFileCheckError(CGTProjFileCheckErrorType errorType, bool isCritical)
@@ -70,3 +80,5 @@ public enum CGTProjFileCheckErrorType
     InvalidValue,
     InvalidComment
 }
+
+#endregion File Check Error
