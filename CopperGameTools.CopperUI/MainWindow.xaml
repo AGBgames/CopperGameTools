@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
-        Title="Copper Game Tools UI" Height="450" Width="800">
+        Title="Copper Game Tools UI" Height="450" Width="800" MaxHeight="450" MaxWidth="800" MinHeight="450" MinWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,11 +13,17 @@
             <RowDefinition Height="500"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            <MenuItem Header="Load" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
-            <MenuItem Header="Save" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Load" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
+                <MenuItem Header="Unoad" x:Name="UnloadMenuItem"  IsEnabled="false" Click="UnloadClickEvent"/>
+                <MenuItem Header="" IsEnabled="false"/>
+                <MenuItem Header="Save" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
+                <MenuItem Header="" IsEnabled="false"/>
+                <MenuItem Header="Quit" IsEnabled="true" Click="QuitClickEvent"/>
+            </MenuItem>
         </Menu>
         <TreeView Grid.Row="1" x:Name="tests" Width="auto">
         </TreeView>
-        <TextBox Grid.Row="2" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+        <TextBox Grid.Row="2" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True" Width="400"></TextBox>
     </Grid>
 </Window>
