@@ -5,13 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
-        Title="Copper Game Tools UI" Height="450" Width="800" MaxHeight="450" MaxWidth="800" MinHeight="450" MinWidth="800">
+        Title="Copper Game Tools UI" Height="720" Width="1080"
+        ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="500"/>
+            <RowDefinition Height="400"/>
+            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>    
+            <ColumnDefinition Width="200"></ColumnDefinition>      
+            <ColumnDefinition Width="800"></ColumnDefinition>      
+        </Grid.ColumnDefinitions>    
+
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Load" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
@@ -21,9 +27,20 @@
                 <MenuItem Header="" IsEnabled="false"/>
                 <MenuItem Header="Quit" IsEnabled="true" Click="QuitClickEvent"/>
             </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Build Project" x:Name="BuildProjectMenuItem" IsEnabled="false" Click="BuildProjectClickEvent"/>
+                <MenuItem Header="Log" x:Name="LogMenuItem" IsEnabled="true">
+                    <MenuItem Header="Clear" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
+                    <MenuItem Header="Save" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
+                </MenuItem>
+            </MenuItem>
         </Menu>
-        <TreeView Grid.Row="1" x:Name="tests" Width="auto">
+
+        <TreeView Grid.Row="1" Grid.Column="0" x:Name="tests" Width="200">
         </TreeView>
-        <TextBox Grid.Row="2" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True" Width="400"></TextBox>
+
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800"></TextBox>
+
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="log" IsEnabled="true" TextWrapping="Wrap" AcceptsReturn="True" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
     </Grid>
 </Window>
