@@ -1,243 +1,266 @@
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Microsoft.Win32;
 using CopperGameTools.Builder;
 using System.Windows.Controls;
 
-namespace CopperGameTools.CopperUI
+namespace CopperGameTools.CopperUI;
+
+public partial class CGTMainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private FileInfo? CurrentFile { get; set; }
+    private DirectoryInfo? CurrentFileDir { get; set; }
+    private CGTProjBuilder? ProjectBuilder { get; set; }
+    private string EditorDefaultLogPrefix { get; }
+    private TreeViewItem SourceFiles { get; set; }
+    private TreeViewItem PkfKeys { get; set; }
+
+    public CGTMainWindow()
     {
-        public FileInfo? CurrentFile { get; set; }
-        public DirectoryInfo? CurrentFileDir { get; set; }
-        public CGTProjBuilder? ProjectBuilder { get; set; }
-        public string EditorNoPKFOpenedText { get; }
-        public string EditorDefaultLogStart { get; }
-        public string EditorDefaultLogPrefix { get; }
-        TreeViewItem SourceFiles { get; set; }
-        TreeViewItem PKFKeys { get; set; }
-        TreeViewItem AssetFiles { get; set; }
+        InitializeComponent();
+        EditorDefaultLogPrefix = $"{DateTime.Now} ->";
+        SourceFiles = new TreeViewItem() { Header = "Source Files" };
+        PkfKeys = new TreeViewItem() { Header = "PKF Keys" };
 
-        public MainWindow()
+        PostStartup();
+    }
+
+    // ------------------------------ Util Methods ------------------------------ \\
+
+    private void PostStartup()
+    {
+        ToggleEditor();
+    }
+
+    private void ToggleEditor()
+    {
+        Editor.IsEnabled = !Editor.IsEnabled;
+    }
+
+    private void TogglePkfButtons()
+    {
+        SaveMenuItem.IsEnabled = !SaveMenuItem.IsEnabled;
+        UnloadMenuItem.IsEnabled = !UnloadMenuItem.IsEnabled;
+        BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
+        CheckPkfMenuItem.IsEnabled = !CheckPkfMenuItem.IsEnabled;
+    }
+
+    private void PrepareOutline()
+    {
+        if (ProjectBuilder?.ProjFile == null || CurrentFileDir == null)
         {
-            InitializeComponent();
-            EditorNoPKFOpenedText = "PLEASE OPEN A PKF-FILE";
-            EditorDefaultLogStart = $"Log Start.\n";
-            EditorDefaultLogPrefix = $"{DateTime.Now} ->";
-            SourceFiles = new TreeViewItem() { Header = "Source Files" };
-            PKFKeys = new TreeViewItem() { Header = "PKF Keys" };
-            AssetFiles = new TreeViewItem() { Header = "Asset Files" };
-
-            PostStartup();
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+                MessageBoxButton.OK);
+            return;
         }
 
-        // ------------------------------ Util Methods ------------------------------ \\
+        Outline.Items.Clear();
+        SourceFiles.Items.Clear();
+        PkfKeys.Items.Clear();
 
-        private void PostStartup()
+        Outline.Items.Add(SourceFiles);
+        Outline.Items.Add(PkfKeys);
+
+        ProjectBuilder.ProjFile.ReloadKeys();
+
+        foreach (var key in ProjectBuilder.ProjFile.FileKeys)
         {
-            DisableEditor();
+            PkfKeys.Items.Add(key.Key);
         }
 
-        private void DisableEditor()
+        var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
+        foreach (var file in Directory.GetFiles($"{CurrentFileDir.FullName}/{srcFileDir}", "*.js",
+                     SearchOption.AllDirectories))
         {
-            editor.Text = "PLEASE OPEN A PKF-FILE";
-            editor.IsEnabled = false;
+            // i just the fucking parent folder from /src/ on, pls fucking god.
+            var info = new FileInfo(file);
+            var name = info.FullName.Split(@"\");
+            SourceFiles.Items.Add($"{name.Last()}");
         }
+    }
 
-        private void EnableEditor()
-        {
-            editor.IsEnabled = true;
-        }
-        
-        private void ToogleOnPKFLoadedButtons()
-        {
-            SaveMenuItem.IsEnabled = !SaveMenuItem.IsEnabled;
-            UnloadMenuItem.IsEnabled = !UnloadMenuItem.IsEnabled;
-            BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
-        }
+    private void CheckPkfFile()
+    {
+        if (ProjectBuilder == null) return;
+        Errors.Clear();
 
-        private void RefreshOutliner()
+        var check = ProjectBuilder.ProjFile.FileCheck();
+
+        if (check.ResultType == CGTProjFileCheckResultType.Errors)
         {
-            SourceFiles.Items.Clear();
-            PKFKeys.Items.Clear();
-            AssetFiles.Items.Clear();
-            
-            // keys
-            foreach (var key in ProjectBuilder?.ProjFile.FileKeys)
+            foreach (var err in check.ResultErrors)
             {
-                PKFKeys.Items.Add(key.Key);
+                Errors.AppendText($"{err.ErrorText} ==> {err.ErrorType} ({err.IsCritical})\n");
             }
+        }
+        else
+        {
+            Errors.Text = "No Problems found.";
+        }
+    }
 
-            // files
-            var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
-            foreach(var file in Directory.GetFiles($"{CurrentFileDir.FullName}{srcFileDir}", "*.js", SearchOption.AllDirectories))
+    private void PostLoad()
+    {
+        Log($"Opening {CurrentFile?.Name}");
+        ToggleEditor();
+        TogglePkfButtons();
+        if (File.Exists(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"))
+        {
+            switch (MessageBox.Show("Load latest saved LogBox?", "Copper Game Tools UI", MessageBoxButton.YesNo,
+                        MessageBoxImage.Question))
             {
-                SourceFiles.Items.Add(file);
+                case MessageBoxResult.Yes:
+                    Log(File.ReadAllText(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"));
+                    break;
+                case MessageBoxResult.No:
+                    break;
             }
         }
 
-        private void PostLoad()
-        {
-            Log($"Opening {CurrentFile?.Name}");
-            EnableEditor();
-            ToogleOnPKFLoadedButtons();
-            if (File.Exists(CurrentFile?.DirectoryName + "/copperui/latest_log.txt")) {
-                Log($"Restoring log from last session with {CurrentFile?.Name}");
-                Log(File.ReadAllText(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"));
-            }
+        CheckPkfFile();
+        PrepareOutline();
+    }
 
-            outline.Items.Add(SourceFiles);
-            outline.Items.Add(PKFKeys);
-            outline.Items.Add(AssetFiles);
-            RefreshOutliner();
+    private void PostUnload()
+    {
+        Log($"Unloading {CurrentFile?.Name}");
+        ToggleEditor();
+        TogglePkfButtons();
+        CurrentFile = null;
+        ProjectBuilder = null;
+        Outline.Items.Clear();
+        Editor.Clear();
+        LogBox.Clear();
+    }
+
+    private void SaveCurrentFile()
+    {
+        if (CurrentFile == null)
+        {
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+                MessageBoxButton.OK);
+            return;
         }
 
-        private void PostUnload()
+        File.WriteAllText(CurrentFile.FullName, Editor.Text);
+        Log($"Saving {CurrentFile.FullName}");
+        CheckPkfFile();
+        PrepareOutline();
+    }
+
+    private void LoadCurrentFile()
+    {
+        OpenFileDialog dialog = new OpenFileDialog();
+        dialog.Multiselect = false;
+        dialog.DefaultExt = ".pkf";
+        dialog.Filter += "PKF Files (*.pkf)|*.pkf";
+
+        if ((bool)dialog.ShowDialog() == false) return;
+
+        try
         {
-            Log($"Unloading {CurrentFile?.Name}");
-            DisableEditor();
-            ToogleOnPKFLoadedButtons();
-            CurrentFile = null;
-            ProjectBuilder = null;
-            outline.Items.Clear();
-        }
-
-        private void SaveCurrentFile()
-        {
-            if (CurrentFile == null)
-            {
-                MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
-                    MessageBoxButton.OK);
-                return;
-            }
-
-            File.WriteAllText(CurrentFile.FullName, editor.Text);
-            // MessageBox.Show("File saved.", "Copper Game Tools UI");
-            Log($"Saving {CurrentFile.FullName}");
-            RefreshOutliner();
-        }
-
-        private void LoadCurrentFile()
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Multiselect = false;
-            dialog.DefaultExt = ".pkf";
-            dialog.Filter += "PKF Files (*.pkf)|*.pkf";
-
-            if ((bool) dialog.ShowDialog() == false) return;
-
-            try
-            {
-                CurrentFile = new FileInfo(dialog.FileName);
+            CurrentFile = new FileInfo(dialog.FileName);
+            if (CurrentFile.DirectoryName != null)
                 CurrentFileDir = new DirectoryInfo(path: CurrentFile.DirectoryName);
-                ProjectBuilder = new CGTProjBuilder(new CGTProjFile(CurrentFile));
-            }
-            catch (System.Exception)
-            {
-                MessageBox.Show("Failed to load PKF-File!", "Copper Game Tools UI", MessageBoxButton.OK, MessageBoxImage.None);
-                throw;
-            }
-
-            Title = $"Copper Game Tools UI | {CurrentFile.Name}";
-
-            editor.Text = File.ReadAllText(CurrentFile.FullName);
-
-            PostLoad();
+            ProjectBuilder = new CGTProjBuilder(new CGTProjFile(CurrentFile));
         }
-        
-        private void Log(string text)
+        catch (System.Exception)
         {
-            log.AppendText($"{EditorDefaultLogPrefix} {text}\n");
+            MessageBox.Show("Failed to load PKF-File!", "Copper Game Tools UI", MessageBoxButton.OK,
+                MessageBoxImage.None);
+            throw;
         }
 
-        // ------------------------------ MenuItem Click Event Handlers ------------------------------ \\
+        Title = $"Copper Game Tools UI | {CurrentFile.Name}";
 
-        public void LoadClickEvent(Object sender, RoutedEventArgs e)
+        Editor.Text = File.ReadAllText(CurrentFile.FullName);
+
+        PostLoad();
+    }
+
+    private void Log(string text)
+    {
+        LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
+    }
+
+    // ------------------------------ MenuItem Click Event Handlers ------------------------------ \\
+
+    private void LoadClickEvent(object sender, RoutedEventArgs e)
+    {
+        LoadCurrentFile();
+    }
+
+    private void SaveClickEvent(object sender, RoutedEventArgs e)
+    {
+        SaveCurrentFile();
+    }
+
+    private void UnloadClickEvent(object sender, RoutedEventArgs e)
+    {
+        if (CurrentFile == null)
         {
-            LoadCurrentFile();
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+                MessageBoxButton.OK);
+            return;
         }
 
-        public void SaveClickEvent(Object sender, RoutedEventArgs e)
+        Title = $"Copper Game Tools UI";
+        PostUnload();
+    }
+
+    private void QuitClickEvent(object sender, RoutedEventArgs e)
+    {
+        if (CurrentFile == null)
         {
-            SaveCurrentFile();
+            this.Close();
         }
-
-        public void UnloadClickEvent(Object sender, RoutedEventArgs e)
+        else
         {
-            if (CurrentFile == null)
-            {
-                MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
-                    MessageBoxButton.OK);
-                return;
-            }
-
-            Title = $"Copper Game Tools UI";
-            PostUnload();
-        }
-
-        public void QuitClickEvent(Object sender, RoutedEventArgs e)
-        {
-            if (CurrentFile == null)
+            if (File.ReadAllText(CurrentFile.FullName) == Editor.Text)
             {
                 this.Close();
+                return;
             }
-            else
+
+            switch (MessageBox.Show($"Save {CurrentFile.Name} before closing? (Unsaved changes will be lost!)",
+                        "Copper Game Tools UI",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question))
             {
-                switch (MessageBox.Show($"Save {CurrentFile.Name} before closing? (Unsaved changes will be lost!)", 
-                    "Copper Game Tools UI", 
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question))
-                {
-                    case MessageBoxResult.Yes:
-                        SaveCurrentFile();
-                        this.Close();
-                        break;
-                    case MessageBoxResult.No:
-                        this.Close();
-                        break;
-                }    
+                case MessageBoxResult.Yes:
+                    SaveCurrentFile();
+                    this.Close();
+                    break;
+                case MessageBoxResult.No:
+                    this.Close();
+                    break;
             }
         }
+    }
 
-        public void BuildProjectClickEvent(Object sender, RoutedEventArgs e)
-        {
-            //TODO: Code
-        }
+    private void BuildProjectClickEvent(object sender, RoutedEventArgs e)
+    {
+        Log("Building project...");
+    }
 
-        public void SaveLogClickEvent(Object sender, RoutedEventArgs e)
-        {
-            Directory.CreateDirectory(CurrentFileDir?.FullName + "/copperui/");
-            File.WriteAllText($"{CurrentFileDir?.FullName}/copperui/latest_log.txt", 
-                log.Text);
-            Log($"Saved log to {CurrentFileDir?.FullName}/copperui/latest_log.txt");
-        }
+    private void CheckPkfClickEvent(object sender, RoutedEventArgs e)
+    {
+        CheckPkfFile();
+    }
 
-        public void ClearLogClickEvent(Object sender, RoutedEventArgs e)
-        {
-            log.Clear();
-        }
+    private void SaveLogClickEvent(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(CurrentFileDir?.FullName + "/copperui/");
+        File.WriteAllText($"{CurrentFileDir?.FullName}/copperui/latest_log.txt",
+            LogBox.Text);
+        Log($"Saved LogBox to {CurrentFileDir?.FullName}/copperui/latest_log.txt");
+    }
 
-        public void AutoSaveLogClickEvent(Object sender, RoutedEventArgs e)
-        {
-            if (AutoSaveLogMenuItem.IsChecked)
-            {
-                AutoSaveLogMenuItem.IsChecked = false;
-                Log("Disabled Log-AutoSave for the current project.");
-            }
-            else
-            { 
-                AutoSaveLogMenuItem.IsChecked = true;
-                Log("Enabled Log-AutoSave for the current project.");
-            }
-        }
-
-        public void EditorTextChanged(Object sender, TextChangedEventArgs e)
-        {
-            RefreshOutliner();
-        }
+    private void ClearLogClickEvent(object sender, RoutedEventArgs e)
+    {
+        LogBox.Clear();
     }
 }
