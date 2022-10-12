@@ -70,9 +70,9 @@ namespace CopperGameTools.CopperUI
 
             // files
             var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
-            foreach(var file in Directory.GetFiles(srcFileDir, "*.js", SearchOption.AllDirectories))
+            foreach(var file in Directory.GetFiles($"{CurrentFileDir.FullName}{srcFileDir}", "*.js", SearchOption.AllDirectories))
             {
-                SourceFiles.Items.Add(file);
+                SourceFiles.Items.Add();
             }
         }
 
@@ -201,7 +201,7 @@ namespace CopperGameTools.CopperUI
 
         public void BuildProjectClickEvent(Object sender, RoutedEventArgs e)
         {
-            
+            //TODO: Code
         }
 
         public void SaveLogClickEvent(Object sender, RoutedEventArgs e)
