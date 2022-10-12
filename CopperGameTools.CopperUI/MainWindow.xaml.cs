@@ -62,6 +62,10 @@ namespace CopperGameTools.CopperUI
 
         private void RefreshOutliner()
         {
+            SourceFiles.Items.Clear();
+            PKFKeys.Items.Clear();
+            AssetFiles.Items.Clear();
+            
             // keys
             foreach (var key in ProjectBuilder?.ProjFile.FileKeys)
             {
@@ -72,7 +76,7 @@ namespace CopperGameTools.CopperUI
             var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
             foreach(var file in Directory.GetFiles($"{CurrentFileDir.FullName}{srcFileDir}", "*.js", SearchOption.AllDirectories))
             {
-                SourceFiles.Items.Add();
+                SourceFiles.Items.Add(file);
             }
         }
 
