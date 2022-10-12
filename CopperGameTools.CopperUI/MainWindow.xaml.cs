@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using CopperGameTools.Builder;
+using System.Windows.Controls;
 
 namespace CopperGameTools.CopperUI
 {
@@ -29,6 +18,9 @@ namespace CopperGameTools.CopperUI
         public string EditorNoPKFOpenedText { get; }
         public string EditorDefaultLogStart { get; }
         public string EditorDefaultLogPrefix { get; }
+        TreeViewItem SourceFiles { get; set; }
+        TreeViewItem PKFKeys { get; set; }
+        TreeViewItem AssetFiles { get; set; }
 
         public MainWindow()
         {
@@ -36,6 +28,10 @@ namespace CopperGameTools.CopperUI
             EditorNoPKFOpenedText = "PLEASE OPEN A PKF-FILE";
             EditorDefaultLogStart = $"Log Start.\n";
             EditorDefaultLogPrefix = $"{DateTime.Now} ->";
+            SourceFiles = new TreeViewItem() { Header = "Source Files" };
+            PKFKeys = new TreeViewItem() { Header = "PKF Keys" };
+            AssetFiles = new TreeViewItem() { Header = "Asset Files" };
+
             PostStartup();
         }
 
@@ -44,7 +40,6 @@ namespace CopperGameTools.CopperUI
         private void PostStartup()
         {
             DisableEditor();
-            log.AppendText(EditorDefaultLogStart);
         }
 
         private void DisableEditor()
@@ -65,6 +60,22 @@ namespace CopperGameTools.CopperUI
             BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
         }
 
+        private void RefreshOutliner()
+        {
+            // keys
+            foreach (var key in ProjectBuilder?.ProjFile.FileKeys)
+            {
+                PKFKeys.Items.Add(key.Key);
+            }
+
+            // files
+            var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
+            foreach(var file in Directory.GetFiles(srcFileDir, "*.js", SearchOption.AllDirectories))
+            {
+                SourceFiles.Items.Add(file);
+            }
+        }
+
         private void PostLoad()
         {
             Log($"Opening {CurrentFile?.Name}");
@@ -74,6 +85,11 @@ namespace CopperGameTools.CopperUI
                 Log($"Restoring log from last session with {CurrentFile?.Name}");
                 Log(File.ReadAllText(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"));
             }
+
+            outline.Items.Add(SourceFiles);
+            outline.Items.Add(PKFKeys);
+            outline.Items.Add(AssetFiles);
+            RefreshOutliner();
         }
 
         private void PostUnload()
@@ -83,6 +99,7 @@ namespace CopperGameTools.CopperUI
             ToogleOnPKFLoadedButtons();
             CurrentFile = null;
             ProjectBuilder = null;
+            outline.Items.Clear();
         }
 
         private void SaveCurrentFile()
@@ -97,6 +114,7 @@ namespace CopperGameTools.CopperUI
             File.WriteAllText(CurrentFile.FullName, editor.Text);
             // MessageBox.Show("File saved.", "Copper Game Tools UI");
             Log($"Saving {CurrentFile.FullName}");
+            RefreshOutliner();
         }
 
         private void LoadCurrentFile()
@@ -197,6 +215,25 @@ namespace CopperGameTools.CopperUI
         public void ClearLogClickEvent(Object sender, RoutedEventArgs e)
         {
             log.Clear();
+        }
+
+        public void AutoSaveLogClickEvent(Object sender, RoutedEventArgs e)
+        {
+            if (AutoSaveLogMenuItem.IsChecked)
+            {
+                AutoSaveLogMenuItem.IsChecked = false;
+                Log("Disabled Log-AutoSave for the current project.");
+            }
+            else
+            { 
+                AutoSaveLogMenuItem.IsChecked = true;
+                Log("Enabled Log-AutoSave for the current project.");
+            }
+        }
+
+        public void EditorTextChanged(Object sender, TextChangedEventArgs e)
+        {
+            RefreshOutliner();
         }
     }
 }

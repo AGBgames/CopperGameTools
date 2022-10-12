@@ -32,14 +32,16 @@
                 <MenuItem Header="Log" x:Name="LogMenuItem" IsEnabled="true">
                     <MenuItem Header="Clear" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
                     <MenuItem Header="Save" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
+                    <MenuItem Header="Enable AutoSave" IsCheckable="true" x:Name="AutoSaveLogMenuItem" IsEnabled="true" Click="AutoSaveLogClickEvent"></MenuItem>
                 </MenuItem>
             </MenuItem>
         </Menu>
 
-        <TreeView Grid.Row="1" Grid.Column="0" x:Name="tests" Width="200">
+        <TreeView Grid.Row="1" Grid.Column="0" x:Name="outline" Width="200">
+            
         </TreeView>
 
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" TextChanged="EditorTextChanged"></TextBox>
 
         <TextBox Grid.Row="2" Grid.Column="1" x:Name="log" IsEnabled="true" TextWrapping="Wrap" AcceptsReturn="True" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
     </Grid>
