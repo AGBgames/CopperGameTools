@@ -7,12 +7,17 @@
         mc:Ignorable="d"
         Title="Copper Game Tools UI" Height="720" Width="1120"
         ResizeMode="NoResize">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SavePkfFileCommand}" Key="F4"/>
+        <KeyBinding Command="{Binding LogSaveCommand}" Key="F5"/>
+        <KeyBinding Command="{Binding LogClearCommand}" Key="F6"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="400"/>
-            <RowDefinition Height="200"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="370"/>
+            <RowDefinition Height="230"/>
+            <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>    
             <ColumnDefinition Width="300"></ColumnDefinition>      
@@ -36,15 +41,18 @@
                     <MenuItem Header="Save" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="Info">
+                <MenuItem Header="About" x:Name="AboutMenuItem" Click="AboutMenuItemClickEvent"></MenuItem>
+            </MenuItem>
         </Menu>
 
         <TreeView Grid.Row="1" Grid.Column="0" x:Name="Outline" Width="300">
             
         </TreeView>
 
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true" VerticalScrollBarVisibility="Visible"></TextBox>
 
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="LogBox" IsEnabled="true" TextWrapping="Wrap" AcceptsReturn="True" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="Errors" IsEnabled="true" TextWrapping="Wrap" AcceptsReturn="True" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="LogBox" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="Errors" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
     </Grid>
 </Window>

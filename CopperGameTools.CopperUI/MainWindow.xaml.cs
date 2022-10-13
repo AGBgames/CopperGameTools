@@ -1,11 +1,12 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 using System.Windows;
 using Microsoft.Win32;
 using CopperGameTools.Builder;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace CopperGameTools.CopperUI;
 
@@ -14,32 +15,55 @@ public partial class CGTMainWindow : Window
     private FileInfo? CurrentFile { get; set; }
     private DirectoryInfo? CurrentFileDir { get; set; }
     private CGTProjBuilder? ProjectBuilder { get; set; }
-    private string EditorDefaultLogPrefix { get; }
-    private TreeViewItem SourceFiles { get; set; }
     private TreeViewItem PkfKeys { get; set; }
+    
+    private string EditorDefaultLogPrefix { get; }
+    private string EditorDefaultLogSavePath { get; }
+    private bool CurrentFileHasLog { get; set; }
+    
+    public ICommand SavePkfFileCommand { get; }
+    public ICommand LogSaveCommand { get; }
+    public ICommand LogClearCommand { get; }
 
     public CGTMainWindow()
     {
         InitializeComponent();
         EditorDefaultLogPrefix = $"{DateTime.Now} ->";
-        SourceFiles = new TreeViewItem() { Header = "Source Files" };
+        EditorDefaultLogSavePath = "/.coppui/log.txt";
         PkfKeys = new TreeViewItem() { Header = "PKF Keys" };
+        
+        SavePkfFileCommand = new ActionCommand(() =>
+        {
+            SavePkfFile();
+        });
+        LogSaveCommand = new ActionCommand(() =>
+        {
+            SaveLog();
+        });
+        LogClearCommand = new ActionCommand(() =>
+        {
+            ClearLog();
+        });
+
+        DataContext = this;
+
+        Editor.FontSize = 17;
+        Editor.FontFamily = new FontFamily("Consola");
 
         PostStartup();
     }
 
     // ------------------------------ Util Methods ------------------------------ \\
 
-    private void PostStartup()
-    {
-        ToggleEditor();
-    }
-
+    // Enables / Disables the editor.
+    // The Editor is disabled on startup (as default).
     private void ToggleEditor()
     {
         Editor.IsEnabled = !Editor.IsEnabled;
     }
 
+    // Enables / Disables the buttons that should only be enabled when a PKF-File is loaded.
+    // Those buttons are disabled on startup (as default).
     private void TogglePkfButtons()
     {
         SaveMenuItem.IsEnabled = !SaveMenuItem.IsEnabled;
@@ -48,6 +72,7 @@ public partial class CGTMainWindow : Window
         CheckPkfMenuItem.IsEnabled = !CheckPkfMenuItem.IsEnabled;
     }
 
+    // Reloads the outline (on the left)
     private void PrepareOutline()
     {
         if (ProjectBuilder?.ProjFile == null || CurrentFileDir == null)
@@ -58,10 +83,8 @@ public partial class CGTMainWindow : Window
         }
 
         Outline.Items.Clear();
-        SourceFiles.Items.Clear();
         PkfKeys.Items.Clear();
 
-        Outline.Items.Add(SourceFiles);
         Outline.Items.Add(PkfKeys);
 
         ProjectBuilder.ProjFile.ReloadKeys();
@@ -70,60 +93,70 @@ public partial class CGTMainWindow : Window
         {
             PkfKeys.Items.Add(key.Key);
         }
-
-        var srcFileDir = ProjectBuilder.ProjFile.KeyGet("src");
-        foreach (var file in Directory.GetFiles($"{CurrentFileDir.FullName}/{srcFileDir}", "*.js",
-                     SearchOption.AllDirectories))
-        {
-            // i just the fucking parent folder from /src/ on, pls fucking god.
-            var info = new FileInfo(file);
-            var name = info.FullName.Split(@"\");
-            SourceFiles.Items.Add($"{name.Last()}");
-        }
     }
 
+    // Checks the PKF File for problems using the FileCheck method built in to the CGTProjBuilder.
     private void CheckPkfFile()
     {
         if (ProjectBuilder == null) return;
         Errors.Clear();
 
-        var check = ProjectBuilder.ProjFile.FileCheck();
+        // checks file.
+        CGTProjFileCheckResult check = ProjectBuilder.ProjFile.FileCheck();
 
-        if (check.ResultType == CGTProjFileCheckResultType.Errors)
+        switch (check.ResultType)
         {
-            foreach (var err in check.ResultErrors)
+            case CGTProjFileCheckResultType.Errors:
             {
-                Errors.AppendText($"{err.ErrorText} ==> {err.ErrorType} ({err.IsCritical})\n");
+                var criticalErrorsFound = false;
+                foreach (var err in check.ResultErrors)
+                {
+                    var isCritic = err.IsCritical;
+                    Errors.AppendText($"{err.ErrorText} => {err.ErrorType} | Is Critical => {isCritic}\n");
+                    if (isCritic && !criticalErrorsFound) criticalErrorsFound = true;
+                }
+
+                break;
             }
-        }
-        else
-        {
-            Errors.Text = "No Problems found.";
+            case CGTProjFileCheckResultType.NoErrors:
+                Errors.Text = "No Problems found.";
+                break;
         }
     }
 
+    // Appends a text to the LogBox.
+    private void Log(string text)
+    {
+        LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
+    }
+
+    // ------------------------------ Post Action Methods ------------------------------ \\
+    
+    // Defines what should happen after the start (outside of the constructor).
+    private void PostStartup()
+    {
+        ToggleEditor();
+
+        LoadPkfFile();
+    }
+
+    // Defines what should happen after loading a PKF.
     private void PostLoad()
     {
         Log($"Opening {CurrentFile?.Name}");
         ToggleEditor();
         TogglePkfButtons();
-        if (File.Exists(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"))
+        if (CurrentFileHasLog)
         {
-            switch (MessageBox.Show("Load latest saved LogBox?", "Copper Game Tools UI", MessageBoxButton.YesNo,
-                        MessageBoxImage.Question))
-            {
-                case MessageBoxResult.Yes:
-                    Log(File.ReadAllText(CurrentFile?.DirectoryName + "/copperui/latest_log.txt"));
-                    break;
-                case MessageBoxResult.No:
-                    break;
-            }
+            LogBox.Clear();
+            Log($"Restoring log from last session with {CurrentFile?.Name}");
+            Log(File.ReadAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}"));
         }
-
         CheckPkfFile();
         PrepareOutline();
     }
 
+    // Defines what should happen after unloading a PKF.
     private void PostUnload()
     {
         Log($"Unloading {CurrentFile?.Name}");
@@ -131,12 +164,16 @@ public partial class CGTMainWindow : Window
         TogglePkfButtons();
         CurrentFile = null;
         ProjectBuilder = null;
+        CurrentFileHasLog = false;
         Outline.Items.Clear();
         Editor.Clear();
         LogBox.Clear();
     }
 
-    private void SaveCurrentFile()
+    // ------------------------------ Action Methods ------------------------------ \\
+    
+    // Saves the current PKF.
+    private void SavePkfFile()
     {
         if (CurrentFile == null)
         {
@@ -147,18 +184,26 @@ public partial class CGTMainWindow : Window
 
         File.WriteAllText(CurrentFile.FullName, Editor.Text);
         Log($"Saving {CurrentFile.FullName}");
+        if (CurrentFileHasLog)
+        {
+            File.WriteAllText(CurrentFileDir?.FullName + EditorDefaultLogSavePath, LogBox.Text);
+        }
         CheckPkfFile();
         PrepareOutline();
+        SaveLog();
     }
 
-    private void LoadCurrentFile()
+    // Loads a PKF
+    private void LoadPkfFile()
     {
-        OpenFileDialog dialog = new OpenFileDialog();
-        dialog.Multiselect = false;
-        dialog.DefaultExt = ".pkf";
+        var dialog = new OpenFileDialog
+        {
+            Multiselect = false,
+            DefaultExt = ".pkf"
+        };
         dialog.Filter += "PKF Files (*.pkf)|*.pkf";
 
-        if ((bool)dialog.ShowDialog() == false) return;
+        if (dialog?.ShowDialog() == false) return;
 
         try
         {
@@ -174,28 +219,40 @@ public partial class CGTMainWindow : Window
             throw;
         }
 
+        CurrentFileHasLog = File.Exists($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
+
         Title = $"Copper Game Tools UI | {CurrentFile.Name}";
 
         Editor.Text = File.ReadAllText(CurrentFile.FullName);
 
         PostLoad();
     }
-
-    private void Log(string text)
+    
+    // Saves the LogBox
+    private void SaveLog()
     {
-        LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
+        Directory.CreateDirectory(CurrentFileDir?.FullName + "/.coppui/");
+        File.WriteAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}",
+            LogBox.Text);
+        Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
+    }
+    
+    // Clears the log
+    private void ClearLog()
+    {
+        LogBox.Clear();
     }
 
     // ------------------------------ MenuItem Click Event Handlers ------------------------------ \\
 
     private void LoadClickEvent(object sender, RoutedEventArgs e)
     {
-        LoadCurrentFile();
+        LoadPkfFile();
     }
 
     private void SaveClickEvent(object sender, RoutedEventArgs e)
     {
-        SaveCurrentFile();
+        SavePkfFile();
     }
 
     private void UnloadClickEvent(object sender, RoutedEventArgs e)
@@ -231,7 +288,7 @@ public partial class CGTMainWindow : Window
                         MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
-                    SaveCurrentFile();
+                    SavePkfFile();
                     this.Close();
                     break;
                 case MessageBoxResult.No:
@@ -244,6 +301,7 @@ public partial class CGTMainWindow : Window
     private void BuildProjectClickEvent(object sender, RoutedEventArgs e)
     {
         Log("Building project...");
+        MessageBox.Show("Please do not build the project.");
     }
 
     private void CheckPkfClickEvent(object sender, RoutedEventArgs e)
@@ -253,14 +311,43 @@ public partial class CGTMainWindow : Window
 
     private void SaveLogClickEvent(object sender, RoutedEventArgs e)
     {
-        Directory.CreateDirectory(CurrentFileDir?.FullName + "/copperui/");
-        File.WriteAllText($"{CurrentFileDir?.FullName}/copperui/latest_log.txt",
-            LogBox.Text);
-        Log($"Saved LogBox to {CurrentFileDir?.FullName}/copperui/latest_log.txt");
+        SaveLog();
     }
 
     private void ClearLogClickEvent(object sender, RoutedEventArgs e)
     {
-        LogBox.Clear();
+        ClearLog();
+    }
+
+    private void AboutMenuItemClickEvent(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show($"Copper Game Tools UI aka. CopperUI v{Assembly.GetExecutingAssembly().GetName().Version} made by Nils 'AGBDev' Boehm. \n" +
+                        $"This Software is only to be used by licensed employees from AGBgames.\n" +
+                        $"It is not to be shared outside of AGBgames.", 
+            "Copper Game Tools UI",
+            MessageBoxButton.OK,
+            MessageBoxImage.Asterisk);
     }
 }
+
+public class ActionCommand : ICommand
+{
+    private readonly Action _action;
+
+    public ActionCommand(Action action)
+    {
+        _action = action;
+    }
+
+    public void Execute(object parameter)
+    {
+        _action();
+    }
+
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
+
+    public event EventHandler CanExecuteChanged;
+}   

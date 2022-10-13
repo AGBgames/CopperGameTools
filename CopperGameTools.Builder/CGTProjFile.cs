@@ -52,6 +52,7 @@ public class CGTProjFile
     {
         var errors = new List<CGTProjFileCheckError>();
         var lineNumber = 1;
+        var criticalKeys = new[] {"src", "projectname", "out"};
 
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
@@ -63,7 +64,8 @@ public class CGTProjFile
             
             if (!line.Contains('=') && !line.StartsWith("#"))
             {
-                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, false, $"[{lineNumber}] '{line}'"));
+                var isCritic = criticalKeys.Contains(line) && line.StartsWith(criticalKeys.Any().ToString());
+                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, isCritic, $"[{lineNumber}] '{line}'"));
             }
 
             lineNumber++;
