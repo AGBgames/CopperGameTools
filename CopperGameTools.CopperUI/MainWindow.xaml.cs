@@ -20,7 +20,8 @@ public partial class CGTMainWindow : Window
     private string EditorDefaultLogPrefix { get; }
     private string EditorDefaultLogSavePath { get; }
     private bool CurrentFileHasLog { get; set; }
-    
+
+    public ICommand LoadPkfFileCommand { get; }
     public ICommand SavePkfFileCommand { get; }
     public ICommand LogSaveCommand { get; }
     public ICommand LogClearCommand { get; }
@@ -28,17 +29,22 @@ public partial class CGTMainWindow : Window
     public CGTMainWindow()
     {
         InitializeComponent();
-        EditorDefaultLogPrefix = $"{DateTime.Now} ->";
+        EditorDefaultLogPrefix = $"[{DateTime.Now}]: ";
         EditorDefaultLogSavePath = "/.coppui/log.txt";
         PkfKeys = new TreeViewItem() { Header = "PKF Keys" };
-        
+
+        LoadPkfFileCommand = new ActionCommand(() =>
+        {
+            PostUnload();
+            LoadPkfFile();
+        });
         SavePkfFileCommand = new ActionCommand(() =>
         {
             SavePkfFile();
         });
         LogSaveCommand = new ActionCommand(() =>
         {
-            SaveLog();
+            SaveLog(true);
         });
         LogClearCommand = new ActionCommand(() =>
         {
@@ -129,6 +135,18 @@ public partial class CGTMainWindow : Window
     {
         LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
     }
+    private void Log(string text, bool usePrefix)
+    {
+        switch (usePrefix)
+        {
+            case true:
+                LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
+                break;
+            case false:
+                LogBox.AppendText($"{text}\n");
+                break;
+        }
+    }
 
     // ------------------------------ Post Action Methods ------------------------------ \\
     
@@ -150,8 +168,7 @@ public partial class CGTMainWindow : Window
         if (CurrentFileHasLog)
         {
             LogBox.Clear();
-            Log($"Restoring log from last session with {CurrentFile?.Name}");
-            Log(File.ReadAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}"));
+            Log(File.ReadAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}"), false);
         }
         CheckPkfFile();
         PrepareOutline();
@@ -192,7 +209,7 @@ public partial class CGTMainWindow : Window
         }
         CheckPkfFile();
         PrepareOutline();
-        SaveLog();
+        SaveLog(true);
     }
 
     // Loads a PKF
@@ -231,10 +248,10 @@ public partial class CGTMainWindow : Window
     }
     
     // Saves the LogBox
-    private void SaveLog()
+    private void SaveLog(bool isSilent)
     {
         Directory.CreateDirectory(CurrentFileDir?.FullName + "/.coppui/");
-        Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
+        if (!isSilent) Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
         File.WriteAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}",
             LogBox.Text);
     }
@@ -313,7 +330,7 @@ public partial class CGTMainWindow : Window
 
     private void SaveLogClickEvent(object sender, RoutedEventArgs e)
     {
-        SaveLog();
+        SaveLog(true);
     }
 
     private void ClearLogClickEvent(object sender, RoutedEventArgs e)
