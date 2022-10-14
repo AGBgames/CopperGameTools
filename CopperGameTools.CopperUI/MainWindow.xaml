@@ -50,7 +50,8 @@
             
         </TreeView>
 
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true" VerticalScrollBarVisibility="Visible"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true" VerticalScrollBarVisibility="Visible" 
+                 FontSize="16" FontFamily="Consolas"></TextBox>
 
         <TextBox Grid.Row="2" Grid.Column="1" x:Name="LogBox" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
         <TextBox Grid.Row="3" Grid.Column="1" x:Name="Errors" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>

@@ -47,23 +47,23 @@ public partial class CGTMainWindow : Window
 
         DataContext = this;
 
-        Editor.FontSize = 17;
-        Editor.FontFamily = new FontFamily("Consola");
-
         PostStartup();
     }
 
     // ------------------------------ Util Methods ------------------------------ \\
 
-    // Enables / Disables the editor.
-    // The Editor is disabled on startup (as default).
+    /**
+     * Enables / Disables the editor.
+     * The Editor is disabled on startup (as default).
+    */
     private void ToggleEditor()
     {
         Editor.IsEnabled = !Editor.IsEnabled;
     }
 
-    // Enables / Disables the buttons that should only be enabled when a PKF-File is loaded.
+    /** Enables / Disables the buttons that should only be enabled when a PKF-File is loaded.
     // Those buttons are disabled on startup (as default).
+    */
     private void TogglePkfButtons()
     {
         SaveMenuItem.IsEnabled = !SaveMenuItem.IsEnabled;
@@ -133,6 +133,7 @@ public partial class CGTMainWindow : Window
     // ------------------------------ Post Action Methods ------------------------------ \\
     
     // Defines what should happen after the start (outside of the constructor).
+    
     private void PostStartup()
     {
         ToggleEditor();
@@ -173,6 +174,7 @@ public partial class CGTMainWindow : Window
     // ------------------------------ Action Methods ------------------------------ \\
     
     // Saves the current PKF.
+    
     private void SavePkfFile()
     {
         if (CurrentFile == null)
@@ -232,9 +234,9 @@ public partial class CGTMainWindow : Window
     private void SaveLog()
     {
         Directory.CreateDirectory(CurrentFileDir?.FullName + "/.coppui/");
+        Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
         File.WriteAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}",
             LogBox.Text);
-        Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
     }
     
     // Clears the log
