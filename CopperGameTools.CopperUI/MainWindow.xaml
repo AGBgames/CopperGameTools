@@ -10,6 +10,7 @@
     <Window.InputBindings>
         <KeyBinding Command="{Binding LoadPkfFileCommand}" Key="F3"/>
         <KeyBinding Command="{Binding SavePkfFileCommand}" Key="F4"/>
+        <KeyBinding Command="{Binding RevealPkfFileCommand}" Key="F7"/>
         <KeyBinding Command="{Binding LogSaveCommand}" Key="F5"/>
         <KeyBinding Command="{Binding LogClearCommand}" Key="F6"/>
     </Window.InputBindings>
@@ -31,6 +32,7 @@
                 <MenuItem Header="Unload" x:Name="UnloadMenuItem"  IsEnabled="false" Click="UnloadClickEvent"/>
                 <MenuItem Header="" IsEnabled="false"/>
                 <MenuItem Header="Save" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
+                <MenuItem Header="Reveal in Explorer" x:Name="RevealInExplorerMenuItem" IsEnabled="false" Click="RevealInExplorerClickEvent"/>
                 <MenuItem Header="" IsEnabled="false"/>
                 <MenuItem Header="Quit" IsEnabled="true" Click="QuitClickEvent"/>
             </MenuItem>
@@ -52,7 +54,7 @@
         </TreeView>
 
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true" VerticalScrollBarVisibility="Visible" 
-                 FontSize="16" FontFamily="Consolas"></TextBox>
+                 FontSize="16" FontFamily="Consolas" UndoLimit="30" IsUndoEnabled="True"></TextBox>
 
         <TextBox Grid.Row="2" Grid.Column="1" x:Name="LogBox" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"
                  FontSize="13" FontFamily="Consolas"></TextBox>

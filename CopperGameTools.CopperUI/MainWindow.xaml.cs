@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using Microsoft.Win32;
 using CopperGameTools.Builder;
@@ -15,14 +17,17 @@ public partial class CGTMainWindow : Window
     private FileInfo? CurrentFile { get; set; }
     private DirectoryInfo? CurrentFileDir { get; set; }
     private CGTProjBuilder? ProjectBuilder { get; set; }
-    private TreeViewItem PkfKeys { get; set; }
+    private bool CurrentFileHasLog { get; set; }
+    
+    private TreeViewItem PkfKeys { get; }
+    private TreeViewItem AssetFiles { get; }
     
     private string EditorDefaultLogPrefix { get; }
     private string EditorDefaultLogSavePath { get; }
-    private bool CurrentFileHasLog { get; set; }
 
     public ICommand LoadPkfFileCommand { get; }
     public ICommand SavePkfFileCommand { get; }
+    public ICommand RevealPkfFileCommand { get; }
     public ICommand LogSaveCommand { get; }
     public ICommand LogClearCommand { get; }
 
@@ -31,22 +36,27 @@ public partial class CGTMainWindow : Window
         InitializeComponent();
         EditorDefaultLogPrefix = $"[{DateTime.Now}]: ";
         EditorDefaultLogSavePath = "/.coppui/log.txt";
-        PkfKeys = new TreeViewItem() { Header = "PKF Keys" };
+        PkfKeys = new TreeViewItem() { Header = "Keys (RFF)" };
+        AssetFiles = new TreeViewItem() { Header = "Asset Files" };
 
-        LoadPkfFileCommand = new ActionCommand(() =>
+        LoadPkfFileCommand = new CGTActionCommand(() =>
         {
             PostUnload();
             LoadPkfFile();
         });
-        SavePkfFileCommand = new ActionCommand(() =>
+        SavePkfFileCommand = new CGTActionCommand(() =>
         {
             SavePkfFile();
         });
-        LogSaveCommand = new ActionCommand(() =>
+        RevealPkfFileCommand = new CGTActionCommand(() =>
+        {
+            RevealInExplorer();
+        });
+        LogSaveCommand = new CGTActionCommand(() =>
         {
             SaveLog(true);
         });
-        LogClearCommand = new ActionCommand(() =>
+        LogClearCommand = new CGTActionCommand(() =>
         {
             ClearLog();
         });
@@ -56,7 +66,7 @@ public partial class CGTMainWindow : Window
         PostStartup();
     }
 
-    // ------------------------------ Util Methods ------------------------------ \\
+    /** ------------------------------ Util Methods ------------------------------ */
 
     /**
      * Enables / Disables the editor.
@@ -76,6 +86,7 @@ public partial class CGTMainWindow : Window
         UnloadMenuItem.IsEnabled = !UnloadMenuItem.IsEnabled;
         BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
         CheckPkfMenuItem.IsEnabled = !CheckPkfMenuItem.IsEnabled;
+        RevealInExplorerMenuItem.IsEnabled = !RevealInExplorerMenuItem.IsEnabled;
     }
 
     // Reloads the outline (on the left)
@@ -90,18 +101,33 @@ public partial class CGTMainWindow : Window
 
         Outline.Items.Clear();
         PkfKeys.Items.Clear();
+        AssetFiles.Items.Clear();
 
         Outline.Items.Add(PkfKeys);
+        Outline.Items.Add(AssetFiles);
 
         ProjectBuilder.ProjFile.ReloadKeys();
 
         foreach (var key in ProjectBuilder.ProjFile.FileKeys)
         {
-            PkfKeys.Items.Add(key.Key);
+            var keyToAdd = new TreeViewItem() { Header = $"{key.Key}" };
+            keyToAdd.MouseLeftButtonUp += TreeItemMouseLeftUpEvent;
+            PkfKeys.Items.Add(keyToAdd);
         }
+        CheckPkfFile();
+    }
+    
+    private void TreeItemMouseLeftUpEvent(object sender, MouseButtonEventArgs e)
+    {
+        var item = sender as TreeViewItem;
+        var keyName = item?.Header.ToString();
+        var keyValue = ProjectBuilder?.ProjFile.KeyGet(item?.Header.ToString());
+        if (keyValue == null || keyName == null) return;
+        var dialog = new KeyChangeInputBox(keyName, keyValue, Editor);
+        dialog.Show();
     }
 
-    // Checks the PKF File for problems using the FileCheck method built in to the CGTProjBuilder.
+    // Checks the PKF File for problems using the FileCheck method from CGTProjBuilder.
     private void CheckPkfFile()
     {
         if (ProjectBuilder == null) return;
@@ -114,12 +140,9 @@ public partial class CGTMainWindow : Window
         {
             case CGTProjFileCheckResultType.Errors:
             {
-                var criticalErrorsFound = false;
                 foreach (var err in check.ResultErrors)
                 {
-                    var isCritic = err.IsCritical;
-                    Errors.AppendText($"{err.ErrorText} => {err.ErrorType} | Is Critical => {isCritic}\n");
-                    if (isCritic && !criticalErrorsFound) criticalErrorsFound = true;
+                    Errors.AppendText($"{err.ErrorText} | Type => {err.ErrorType} | Is Critical => {err.IsCritical}\n");
                 }
 
                 break;
@@ -148,10 +171,18 @@ public partial class CGTMainWindow : Window
         }
     }
 
-    // ------------------------------ Post Action Methods ------------------------------ \\
-    
+    private void RevealInExplorer()
+    {
+        var proc = new Process();
+        proc.StartInfo.FileName = "explorer.exe";
+        proc.StartInfo.Arguments += $"{CurrentFileDir?.FullName}";
+        proc.Start();
+        proc.WaitForExit();
+    }
+
+    /** ------------------------------ Post Action Methods ------------------------------ */
+
     // Defines what should happen after the start (outside of the constructor).
-    
     private void PostStartup()
     {
         ToggleEditor();
@@ -188,10 +219,9 @@ public partial class CGTMainWindow : Window
         LogBox.Clear();
     }
 
-    // ------------------------------ Action Methods ------------------------------ \\
+    /** ------------------------------ Action Methods ------------------------------ */
     
     // Saves the current PKF.
-    
     private void SavePkfFile()
     {
         if (CurrentFile == null)
@@ -262,7 +292,7 @@ public partial class CGTMainWindow : Window
         LogBox.Clear();
     }
 
-    // ------------------------------ MenuItem Click Event Handlers ------------------------------ \\
+    /** ------------------------------ MenuItem Click Event Handlers ------------------------------ */
 
     private void LoadClickEvent(object sender, RoutedEventArgs e)
     {
@@ -347,26 +377,9 @@ public partial class CGTMainWindow : Window
             MessageBoxButton.OK,
             MessageBoxImage.Asterisk);
     }
+
+    private void RevealInExplorerClickEvent(object sender, RoutedEventArgs e)
+    {
+        RevealInExplorer();
+    }
 }
-
-public class ActionCommand : ICommand
-{
-    private readonly Action _action;
-
-    public ActionCommand(Action action)
-    {
-        _action = action;
-    }
-
-    public void Execute(object parameter)
-    {
-        _action();
-    }
-
-    public bool CanExecute(object parameter)
-    {
-        return true;
-    }
-
-    public event EventHandler CanExecuteChanged;
-}   

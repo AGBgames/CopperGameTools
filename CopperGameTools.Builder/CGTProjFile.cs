@@ -16,10 +16,12 @@ public class CGTProjFile
         SourceFile = sourceFile;
         FileKeys = new List<CGTProjFileKey>();
 
+        var lineNumber = 1;
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains("=") || line.StartsWith("#")) continue;
-            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1]));
+            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
+            lineNumber++;
         }
     }
 
@@ -31,10 +33,12 @@ public class CGTProjFile
         FileKeys.Clear();
         FileKeys = new List<CGTProjFileKey>();
 
+        var lineNumber = 1;
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
-            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1]));
+            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
+            lineNumber++;
         }
     }
 
@@ -52,26 +56,55 @@ public class CGTProjFile
     {
         var errors = new List<CGTProjFileCheckError>();
         var lineNumber = 1;
-        var criticalKeys = new[] {"src", "projectname", "out"};
+        var criticalKeys = new[]
+        {
+            "project.name", 
+            "project.src.dir", 
+            "project.out.dir", 
+            "project.out.name",
+            "project.out.version",
+            "project.platform"
+        };
 
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line))
+            if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
             {
                 lineNumber++;
                 continue;
             }
             
-            if (!line.Contains('=') && !line.StartsWith("#"))
+            if (!line.Contains('='))
             {
-                var isCritic = criticalKeys.Contains(line) && line.StartsWith(criticalKeys.Any().ToString());
-                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, isCritic, $"[{lineNumber}] '{line}'"));
+                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+            }
+            
+            if (line.Contains('='))
+            {
+                if (line.Split('=')[1] == "")
+                {
+                    errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidValue, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                }
             }
 
             lineNumber++;
         }
 
         return errors.Count > 0 ? new CGTProjFileCheckResult(CGTProjFileCheckResultType.Errors, errors) : new CGTProjFileCheckResult(CGTProjFileCheckResultType.NoErrors, new List<CGTProjFileCheckError>());
+    }
+    
+    private bool IsCritic(string line, string[] criticalKeys)
+    {
+        var isCritic = false;
+        if (criticalKeys.Contains(line.Replace("=", "")))
+        {
+            foreach (var criticKey in criticalKeys)
+            {
+                if (line.StartsWith(criticKey)) isCritic = true;
+            }
+        }
+
+        return isCritic;
     }
 }
 
