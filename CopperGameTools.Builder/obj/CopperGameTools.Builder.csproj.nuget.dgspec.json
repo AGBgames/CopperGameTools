@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj": {}
+    "C:\\Users\\Nils Böhm\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj": {
+    "C:\\Users\\Nils Böhm\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj",
+        "projectUniqueName": "C:\\Users\\Nils Böhm\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj",
         "projectName": "CopperGameTools.Builder",
-        "projectPath": "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj",
-        "packagesPath": "C:\\Users\\nils1\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\obj\\",
+        "projectPath": "C:\\Users\\Nils Böhm\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\CopperGameTools.Builder.csproj",
+        "packagesPath": "C:\\Users\\Nils Böhm\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Nils Böhm\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.Builder\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\nils1\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Nils Böhm\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -55,7 +55,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

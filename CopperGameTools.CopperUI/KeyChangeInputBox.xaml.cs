@@ -22,14 +22,23 @@ public partial class KeyChangeInputBox : Window
         NewKeyValue.Text = OldKeyValue;
     }
 
+    public CheckBox IsAddNew => this.AddNew;
+
     private void OKButtonClickEvent(object sender, RoutedEventArgs e)
     {
         UpdateKey();
         Close();
     }
 
+
     private void UpdateKey()
     {
-        Editor.Text = Editor.Text.Replace($"{OldKeyName}={OldKeyValue}", $"{NewKeyName.Text}={NewKeyValue.Text}");
+        if ((bool)AddNew.IsChecked)
+        {
+            Editor.Text += $"\n{NewKeyName.Text}={NewKeyValue.Text}";           
+        }
+        else {
+            Editor.Text = Editor.Text.Replace($"{OldKeyName}={OldKeyValue}", $"{NewKeyName.Text}={NewKeyValue.Text}");
+        }
     }
 }

@@ -1,17 +1,19 @@
-﻿<Window x:Class="CopperGameTools.CopperUI.KeyChangeInputBox"
+<Window x:Class="CopperGameTools.CopperUI.KeyChangeInputBox"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
-        Title="Copper Game Tools UI - Fast Edit Key" Height="190" Width="350"
+        Title="Copper Game Tools UI - Fast Edit Key" Height="230" Width="450"
         ResizeMode="NoResize">
-    <StackPanel>
-        <TextBlock Text="New Key Name" />
-        <TextBox x:Name="NewKeyName" Text=""/>
-        <TextBlock Text="New Key Value" />
-        <TextBox x:Name="NewKeyValue"/>
-        <Button Content="OK" Click="OKButtonClickEvent" />
-    </StackPanel>
+        <StackPanel>
+            <Label Content="Add New?" HorizontalAlignment="Center"/>
+            <CheckBox x:Name="AddNew" HorizontalAlignment="Center"/>
+            <Label Content="New Key Name" HorizontalAlignment="Center"/>
+            <TextBox Width="200" MaxLength="100" x:Name="NewKeyName"/>
+            <Label Content="New Key Value" HorizontalAlignment="Center"/>
+            <TextBox Width="200" MaxLength="100" x:Name="NewKeyValue"/>
+            <Button Content="Apply" Click="OKButtonClickEvent"/>
+        </StackPanel>
 </Window>

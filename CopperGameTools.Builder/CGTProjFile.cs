@@ -32,6 +32,7 @@ public class CGTProjFile
 
     public string KeyGet(string searchKey)
     {
+        if (searchKey == null) return "";
         foreach (var key in FileKeys)
         {
             if (key.Key == searchKey) return key.Value;
@@ -60,7 +61,9 @@ public class CGTProjFile
             "project.out.dir", 
             "project.out.name",
             "project.out.version",
-            "project.platform"
+            "project.platform",
+            "project.platform.cache",
+            "project.platform.cache.path"
         };
 
         var readKeys = new List<CGTProjFileKey>();
@@ -86,7 +89,9 @@ public class CGTProjFile
                 continue;
             }
             
-            var keyToAdd = new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber);
+            var keyToAdd = new CGTProjFileKey(line.Split('=')[0], 
+                line.Split('=')[1], 
+                lineNumber);
 
             foreach (var key in readKeys)
             {

@@ -85,6 +85,7 @@ public partial class CGTMainWindow : Window
         BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
         CheckPkfMenuItem.IsEnabled = !CheckPkfMenuItem.IsEnabled;
         RevealInExplorerMenuItem.IsEnabled = !RevealInExplorerMenuItem.IsEnabled;
+        FastEditKeyMenuItem.IsEnabled = !FastEditKeyMenuItem.IsEnabled;
     }
 
     // Reloads the outline (on the left)
@@ -109,20 +110,20 @@ public partial class CGTMainWindow : Window
         foreach (var key in ProjectBuilder.ProjFile.FileKeys)
         {
             var keyToAdd = new TreeViewItem() { Header = $"{key.Key}" };
-            keyToAdd.MouseLeftButtonUp += TreeItemMouseLeftUpEvent;
+            keyToAdd.MouseLeftButtonUp += FastEditKeyEvent;
             KeysFromFile.Items.Add(keyToAdd);
         }
         CheckPkfFile();
     }
     
-    private void TreeItemMouseLeftUpEvent(object sender, MouseButtonEventArgs e)
+    private void FastEditKeyEvent(object sender, MouseButtonEventArgs e)
     {
-        if (sender == null) return;
-
         var item = sender as TreeViewItem;
-        var keyName = item?.Header.ToString();
+        
         var keyValue = ProjectBuilder?.ProjFile.KeyGet(item?.Header.ToString());
+        var keyName = item?.Header.ToString();
         if (keyValue == null || keyName == null) return;
+
         var dialog = new KeyChangeInputBox(keyName, keyValue, Editor);
         dialog.Show();
     }
@@ -133,7 +134,6 @@ public partial class CGTMainWindow : Window
         if (ProjectBuilder == null) return;
         Errors.Clear();
 
-        // checks file.
         CGTProjFileCheckResult check = ProjectBuilder.ProjFile.FileCheck();
 
         switch (check.ResultType)
@@ -158,6 +158,7 @@ public partial class CGTMainWindow : Window
     {
         LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
     }
+    
     private void Log(string text, bool usePrefix)
     {
         switch (usePrefix)
@@ -171,6 +172,7 @@ public partial class CGTMainWindow : Window
         }
     }
 
+    // Opens the file exlorer in the directory of the pkf.
     private void RevealInExplorer()
     {
         var proc = new Process();
@@ -252,7 +254,9 @@ public partial class CGTMainWindow : Window
         };
         dialog.Filter += "PKF Files (*.pkf)|*.pkf";
 
+        if (dialog == null) return;
         if (dialog?.ShowDialog() == false) return;
+        if (dialog?.FileName == null) return;
 
         try
         {
@@ -381,5 +385,12 @@ public partial class CGTMainWindow : Window
     private void RevealInExplorerClickEvent(object sender, RoutedEventArgs e)
     {
         RevealInExplorer();
+    }
+
+    private void FastEditKeyClickEvent(object sender, RoutedEventArgs e)
+    {
+        var dialog = new KeyChangeInputBox("", "", Editor);
+        dialog.IsAddNew.IsChecked = true;
+        dialog.Show();
     }
 }

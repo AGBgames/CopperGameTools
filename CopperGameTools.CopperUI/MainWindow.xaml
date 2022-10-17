@@ -28,11 +28,11 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Load" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
+                <MenuItem Header="Load | F3" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
                 <MenuItem Header="Unload" x:Name="UnloadMenuItem"  IsEnabled="false" Click="UnloadClickEvent"/>
                 <MenuItem Header="" IsEnabled="false"/>
-                <MenuItem Header="Save" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
-                <MenuItem Header="Reveal in Explorer" x:Name="RevealInExplorerMenuItem" IsEnabled="false" Click="RevealInExplorerClickEvent"/>
+                <MenuItem Header="Save | F4" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
+                <MenuItem Header="Reveal in Explorer | F7" x:Name="RevealInExplorerMenuItem" IsEnabled="false" Click="RevealInExplorerClickEvent"/>
                 <MenuItem Header="" IsEnabled="false"/>
                 <MenuItem Header="Quit" IsEnabled="true" Click="QuitClickEvent"/>
             </MenuItem>
@@ -40,9 +40,10 @@
                 <MenuItem Header="Build Project" x:Name="BuildProjectMenuItem" IsEnabled="false" Click="BuildProjectClickEvent"/>
                 <MenuItem Header="Check PKF" x:Name="CheckPkfMenuItem" IsEnabled="false" Click="CheckPkfClickEvent"/>
                 <MenuItem Header="Log" x:Name="LogMenuItem" IsEnabled="true">
-                    <MenuItem Header="Clear" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
-                    <MenuItem Header="Save" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
+                    <MenuItem Header="Clear | F6" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
+                    <MenuItem Header="Save | F5" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
                 </MenuItem>
+                <MenuItem Header="Add / Replace Key" x:Name="FastEditKeyMenuItem" IsEnabled="false" Click="FastEditKeyClickEvent"/>
             </MenuItem>
             <MenuItem Header="Info">
                 <MenuItem Header="About" x:Name="AboutMenuItem" Click="AboutMenuItemClickEvent"></MenuItem>
