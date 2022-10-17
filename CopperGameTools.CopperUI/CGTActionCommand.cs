@@ -22,5 +22,5 @@ public class CGTActionCommand : ICommand
         return true;
     }
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 }

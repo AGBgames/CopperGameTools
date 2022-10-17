@@ -2,13 +2,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Windows;
 using Microsoft.Win32;
 using CopperGameTools.Builder;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace CopperGameTools.CopperUI;
 
@@ -19,7 +17,7 @@ public partial class CGTMainWindow : Window
     private CGTProjBuilder? ProjectBuilder { get; set; }
     private bool CurrentFileHasLog { get; set; }
     
-    private TreeViewItem PkfKeys { get; }
+    private TreeViewItem KeysFromFile { get; }
     private TreeViewItem AssetFiles { get; }
     
     private string EditorDefaultLogPrefix { get; }
@@ -36,7 +34,7 @@ public partial class CGTMainWindow : Window
         InitializeComponent();
         EditorDefaultLogPrefix = $"[{DateTime.Now}]: ";
         EditorDefaultLogSavePath = "/.coppui/log.txt";
-        PkfKeys = new TreeViewItem() { Header = "Keys (RFF)" };
+        KeysFromFile = new TreeViewItem() { Header = "Keys (Read From File)" };
         AssetFiles = new TreeViewItem() { Header = "Asset Files" };
 
         LoadPkfFileCommand = new CGTActionCommand(() =>
@@ -100,10 +98,10 @@ public partial class CGTMainWindow : Window
         }
 
         Outline.Items.Clear();
-        PkfKeys.Items.Clear();
+        KeysFromFile.Items.Clear();
         AssetFiles.Items.Clear();
 
-        Outline.Items.Add(PkfKeys);
+        Outline.Items.Add(KeysFromFile);
         Outline.Items.Add(AssetFiles);
 
         ProjectBuilder.ProjFile.ReloadKeys();
@@ -112,13 +110,15 @@ public partial class CGTMainWindow : Window
         {
             var keyToAdd = new TreeViewItem() { Header = $"{key.Key}" };
             keyToAdd.MouseLeftButtonUp += TreeItemMouseLeftUpEvent;
-            PkfKeys.Items.Add(keyToAdd);
+            KeysFromFile.Items.Add(keyToAdd);
         }
         CheckPkfFile();
     }
     
     private void TreeItemMouseLeftUpEvent(object sender, MouseButtonEventArgs e)
     {
+        if (sender == null) return;
+
         var item = sender as TreeViewItem;
         var keyName = item?.Header.ToString();
         var keyValue = ProjectBuilder?.ProjFile.KeyGet(item?.Header.ToString());

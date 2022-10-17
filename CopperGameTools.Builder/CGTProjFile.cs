@@ -16,13 +16,7 @@ public class CGTProjFile
         SourceFile = sourceFile;
         FileKeys = new List<CGTProjFileKey>();
 
-        var lineNumber = 1;
-        foreach (var line in File.ReadAllLines(SourceFile.FullName))
-        {
-            if (!line.Contains("=") || line.StartsWith("#")) continue;
-            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
-            lineNumber++;
-        }
+        AddKeys();
     }
 
     public void ReloadKeys()
@@ -33,13 +27,7 @@ public class CGTProjFile
         FileKeys.Clear();
         FileKeys = new List<CGTProjFileKey>();
 
-        var lineNumber = 1;
-        foreach (var line in File.ReadAllLines(SourceFile.FullName))
-        {
-            if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
-            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
-            lineNumber++;
-        }
+        AddKeys();
     }
 
     public string KeyGet(string searchKey)
@@ -47,6 +35,15 @@ public class CGTProjFile
         foreach (var key in FileKeys)
         {
             if (key.Key == searchKey) return key.Value;
+        }
+        return "";
+    }
+
+    public string KeyGet(int line)
+    {
+        foreach (var key in FileKeys)
+        {
+            if (key.Line == line) return key.Value;
         }
         return "";
     }
@@ -66,6 +63,7 @@ public class CGTProjFile
             "project.platform"
         };
 
+        var readKeys = new List<CGTProjFileKey>();
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
             if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
@@ -77,16 +75,30 @@ public class CGTProjFile
             if (!line.Contains('='))
             {
                 errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                lineNumber++;
+                continue;
             }
             
-            if (line.Contains('='))
+            if (line.Split('=')[1] == "")
             {
-                if (line.Split('=')[1] == "")
+                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidValue, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                lineNumber++;
+                continue;
+            }
+            
+            var keyToAdd = new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber);
+
+            foreach (var key in readKeys)
+            {
+                if (key.Key == keyToAdd.Key)
                 {
-                    errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidValue, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                    errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.DuplicatedKey, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                    lineNumber++;
+                    continue;
                 }
             }
 
+            readKeys.Add(keyToAdd);
             lineNumber++;
         }
 
@@ -105,6 +117,17 @@ public class CGTProjFile
         }
 
         return isCritic;
+    }
+
+    private void AddKeys()
+    {
+        var lineNumber = 1;
+        foreach (var line in File.ReadAllLines(SourceFile.FullName))
+        {
+            if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
+            FileKeys.Add(new CGTProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
+            lineNumber++;
+        }
     }
 }
 
@@ -150,7 +173,8 @@ public enum CGTProjFileCheckErrorType
 {
     InvalidKey,
     InvalidValue,
-    InvalidComment
+    InvalidComment,
+    DuplicatedKey
 }
 
 #endregion File Check Error
