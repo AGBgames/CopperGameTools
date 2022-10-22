@@ -28,6 +28,8 @@ public partial class CGTMainWindow : Window
     public ICommand RevealPkfFileCommand { get; }
     public ICommand LogSaveCommand { get; }
     public ICommand LogClearCommand { get; }
+    public ICommand FastEditKeyCommand { get; }
+        
 
     public CGTMainWindow()
     {
@@ -58,6 +60,9 @@ public partial class CGTMainWindow : Window
         {
             ClearLog();
         });
+        FastEditKeyCommand = new CGTActionCommand(() => {
+            FastEditKey();
+        });
 
         DataContext = this;
 
@@ -74,7 +79,7 @@ public partial class CGTMainWindow : Window
     {
         Editor.IsEnabled = !Editor.IsEnabled;
     }
-
+    
     /** Enables / Disables the buttons that should only be enabled when a PKF-File is loaded.
     // Those buttons are disabled on startup (as default).
     */
@@ -88,7 +93,11 @@ public partial class CGTMainWindow : Window
         FastEditKeyMenuItem.IsEnabled = !FastEditKeyMenuItem.IsEnabled;
     }
 
-    // Reloads the outline (on the left)
+    /**
+     * Reloads the Project-Outliner (the TreeView on the left)
+     * Shows the saved Keys, Asset Files and more.
+     * It also offers tools like Fast Edit Key.
+     */
     private void PrepareOutline()
     {
         if (ProjectBuilder?.ProjFile == null || CurrentFileDir == null)
@@ -180,6 +189,13 @@ public partial class CGTMainWindow : Window
         proc.StartInfo.Arguments += $"{CurrentFileDir?.FullName}";
         proc.Start();
         proc.WaitForExit();
+    }
+    
+    private void FastEditKey()
+    {
+        var dialog = new KeyChangeInputBox("", "", Editor);
+        dialog.IsAddNew.IsChecked = true;
+        dialog.Show();
     }
 
     /** ------------------------------ Post Action Methods ------------------------------ */
@@ -353,8 +369,23 @@ public partial class CGTMainWindow : Window
 
     private void BuildProjectClickEvent(object sender, RoutedEventArgs e)
     {
+        if (ProjectBuilder == null) return;
+
         Log("Building project...");
-        MessageBox.Show("Please do not build the project.");
+        var build = ProjectBuilder?.Build();
+
+        switch (build?.ResultType)
+        {
+            case CGTProjBuilderResultType.DoneNoErrors:
+                Log("Project build without any errors.");
+                break;
+            case CGTProjBuilderResultType.DoneWithErrors:
+                Log("Project build with errors.");
+                break;
+            case CGTProjBuilderResultType.FailedWithErrors:
+                Log("Project build failed with errors.");
+                break;
+        }
     }
 
     private void CheckPkfClickEvent(object sender, RoutedEventArgs e)
@@ -389,8 +420,6 @@ public partial class CGTMainWindow : Window
 
     private void FastEditKeyClickEvent(object sender, RoutedEventArgs e)
     {
-        var dialog = new KeyChangeInputBox("", "", Editor);
-        dialog.IsAddNew.IsChecked = true;
-        dialog.Show();
+        FastEditKey();
     }
 }

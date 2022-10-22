@@ -13,6 +13,7 @@
         <KeyBinding Command="{Binding RevealPkfFileCommand}" Key="F7"/>
         <KeyBinding Command="{Binding LogSaveCommand}" Key="F5"/>
         <KeyBinding Command="{Binding LogClearCommand}" Key="F6"/>
+        <KeyBinding Command="{Binding FastEditKeyCommand}" Key="F2"/>
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -43,7 +44,7 @@
                     <MenuItem Header="Clear | F6" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
                     <MenuItem Header="Save | F5" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Add / Replace Key" x:Name="FastEditKeyMenuItem" IsEnabled="false" Click="FastEditKeyClickEvent"/>
+                <MenuItem Header="Add Key | F2" x:Name="FastEditKeyMenuItem" IsEnabled="false" Click="FastEditKeyClickEvent"/>
             </MenuItem>
             <MenuItem Header="Info">
                 <MenuItem Header="About" x:Name="AboutMenuItem" Click="AboutMenuItemClickEvent"></MenuItem>
