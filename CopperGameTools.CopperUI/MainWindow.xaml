@@ -14,6 +14,7 @@
         <KeyBinding Command="{Binding LogSaveCommand}" Key="F5"/>
         <KeyBinding Command="{Binding LogClearCommand}" Key="F6"/>
         <KeyBinding Command="{Binding FastEditKeyCommand}" Key="F2"/>
+        <KeyBinding Command="{Binding BuildProjectCommand}" Key="F8"></KeyBinding>
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>

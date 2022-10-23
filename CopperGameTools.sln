@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.Builder", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.CopperUI", "CopperGameTools.CopperUI\CopperGameTools.CopperUI.csproj", "{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.CLI", "CopperGameTools.CLI\CopperGameTools.CLI.csproj", "{03506596-B408-4D99-A827-C3577CF9EF7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.GameService", "CopperGameTools.GameService\CopperGameTools.GameService.csproj", "{5D6E58E1-7444-4FD1-8619-239B13B39D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03506596-B408-4D99-A827-C3577CF9EF7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03506596-B408-4D99-A827-C3577CF9EF7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03506596-B408-4D99-A827-C3577CF9EF7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03506596-B408-4D99-A827-C3577CF9EF7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D6E58E1-7444-4FD1-8619-239B13B39D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D6E58E1-7444-4FD1-8619-239B13B39D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D6E58E1-7444-4FD1-8619-239B13B39D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D6E58E1-7444-4FD1-8619-239B13B39D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

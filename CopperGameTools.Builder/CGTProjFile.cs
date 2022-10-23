@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace CopperGameTools.Builder;
 
@@ -35,7 +36,17 @@ public class CGTProjFile
         if (searchKey == null) return "";
         foreach (var key in FileKeys)
         {
-            if (key.Key == searchKey) return key.Value;
+            if (key.Key != searchKey) continue;
+            if (key.Value.Contains('$'))
+            {
+                var split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < split.Length; i++)
+                {
+                    if (string.IsNullOrEmpty(KeyGet(split[i]))) continue;
+                    key.Value = key.Value.Replace($"${split[i]}$", KeyGet(split[i]));
+                }
+            }
+            return key.Value;
         }
         return "";
     }
@@ -47,6 +58,16 @@ public class CGTProjFile
             if (key.Line == line) return key.Value;
         }
         return "";
+    }
+
+    public void PrintErros()
+    {
+        foreach (var err in FileCheck().ResultErrors)
+        {
+            System.Console.WriteLine(
+                "{err.ErrorText} | ErrorType -> {err.ErrorType} | Is Critical -> {err.IsCritical}"
+            );
+        }
     }
 
     // Checks the file for errors (invalid comments and keys etc)

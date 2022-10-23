@@ -29,6 +29,7 @@ public partial class CGTMainWindow : Window
     public ICommand LogSaveCommand { get; }
     public ICommand LogClearCommand { get; }
     public ICommand FastEditKeyCommand { get; }
+    public ICommand BuildProjectCommand { get; }
         
 
     public CGTMainWindow()
@@ -62,6 +63,9 @@ public partial class CGTMainWindow : Window
         });
         FastEditKeyCommand = new CGTActionCommand(() => {
             FastEditKey();
+        });
+        BuildProjectCommand = new CGTActionCommand(() => {
+            BuildProject();
         });
 
         DataContext = this;
@@ -196,6 +200,28 @@ public partial class CGTMainWindow : Window
         var dialog = new KeyChangeInputBox("", "", Editor);
         dialog.IsAddNew.IsChecked = true;
         dialog.Show();
+    }
+
+    private void BuildProject()
+    {
+        if (ProjectBuilder == null) return;
+
+        Log("Building project...");
+        var build = ProjectBuilder?.Build();
+
+        switch (build?.ResultType)
+        {
+            case CGTProjBuilderResultType.DoneNoErrors:
+                Log("Project build without any errors.");
+                break;
+            case CGTProjBuilderResultType.DoneWithErrors:
+                Log("Project build with errors.");
+                break;
+            case CGTProjBuilderResultType.FailedWithErrors:
+                Log("Project build failed with errors.");
+                MessageBox.Show("Build failed with errors.");
+                break;
+        }
     }
 
     /** ------------------------------ Post Action Methods ------------------------------ */
@@ -369,23 +395,7 @@ public partial class CGTMainWindow : Window
 
     private void BuildProjectClickEvent(object sender, RoutedEventArgs e)
     {
-        if (ProjectBuilder == null) return;
-
-        Log("Building project...");
-        var build = ProjectBuilder?.Build();
-
-        switch (build?.ResultType)
-        {
-            case CGTProjBuilderResultType.DoneNoErrors:
-                Log("Project build without any errors.");
-                break;
-            case CGTProjBuilderResultType.DoneWithErrors:
-                Log("Project build with errors.");
-                break;
-            case CGTProjBuilderResultType.FailedWithErrors:
-                Log("Project build failed with errors.");
-                break;
-        }
+        BuildProject();
     }
 
     private void CheckPkfClickEvent(object sender, RoutedEventArgs e)
@@ -405,7 +415,7 @@ public partial class CGTMainWindow : Window
 
     private void AboutMenuItemClickEvent(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"Copper Game Tools UI aka. CopperUI v{Assembly.GetExecutingAssembly().GetName().Version} made by Nils 'AGBDev' Boehm. \n" +
+        MessageBox.Show($"Copper Game Tools UI aka. CopperUI v0.1.2 made by Nils 'AGBDev' Boehm. \n" +
                         $"This Software is only to be used by licensed employees from AGBgames.\n" +
                         $"It is not to be shared outside of AGBgames.", 
             "Copper Game Tools UI",

@@ -10,6 +10,6 @@ public class CGTProjFileKey
     }
 	
 	public string Key { get; }
-	public string Value { get; }
+	public string Value { get; set; }
 	public int Line { get; }
 }
