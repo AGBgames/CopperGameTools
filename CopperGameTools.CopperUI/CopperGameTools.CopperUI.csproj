@@ -1,7 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Remove="FeatureWindows\SplashScreen1.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CopperGameTools.Builder\CopperGameTools.Builder.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="FeatureWindows\SplashScreen1.png" />
   </ItemGroup>
 
   <PropertyGroup>

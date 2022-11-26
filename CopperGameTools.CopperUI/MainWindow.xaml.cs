@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using CopperGameTools.Builder;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CopperGameTools.CopperUI.FeatureWindows;
 
 namespace CopperGameTools.CopperUI;
 
@@ -15,7 +16,6 @@ public partial class CGTMainWindow : Window
     private FileInfo? CurrentFile { get; set; }
     private DirectoryInfo? CurrentFileDir { get; set; }
     private CGTProjBuilder? ProjectBuilder { get; set; }
-    private bool CurrentFileHasLog { get; set; }
     
     private TreeViewItem KeysFromFile { get; }
     private TreeViewItem AssetFiles { get; }
@@ -26,12 +26,9 @@ public partial class CGTMainWindow : Window
     public ICommand LoadPkfFileCommand { get; }
     public ICommand SavePkfFileCommand { get; }
     public ICommand RevealPkfFileCommand { get; }
-    public ICommand LogSaveCommand { get; }
-    public ICommand LogClearCommand { get; }
     public ICommand FastEditKeyCommand { get; }
     public ICommand BuildProjectCommand { get; }
         
-
     public CGTMainWindow()
     {
         InitializeComponent();
@@ -47,19 +44,11 @@ public partial class CGTMainWindow : Window
         });
         SavePkfFileCommand = new CGTActionCommand(() =>
         {
-            SavePkfFile();
+            SavePkfFile(false);
         });
         RevealPkfFileCommand = new CGTActionCommand(() =>
         {
             RevealInExplorer();
-        });
-        LogSaveCommand = new CGTActionCommand(() =>
-        {
-            SaveLog(true);
-        });
-        LogClearCommand = new CGTActionCommand(() =>
-        {
-            ClearLog();
         });
         FastEditKeyCommand = new CGTActionCommand(() => {
             FastEditKey();
@@ -92,7 +81,6 @@ public partial class CGTMainWindow : Window
         SaveMenuItem.IsEnabled = !SaveMenuItem.IsEnabled;
         UnloadMenuItem.IsEnabled = !UnloadMenuItem.IsEnabled;
         BuildProjectMenuItem.IsEnabled = !BuildProjectMenuItem.IsEnabled;
-        CheckPkfMenuItem.IsEnabled = !CheckPkfMenuItem.IsEnabled;
         RevealInExplorerMenuItem.IsEnabled = !RevealInExplorerMenuItem.IsEnabled;
         FastEditKeyMenuItem.IsEnabled = !FastEditKeyMenuItem.IsEnabled;
     }
@@ -106,7 +94,7 @@ public partial class CGTMainWindow : Window
     {
         if (ProjectBuilder?.ProjFile == null || CurrentFileDir == null)
         {
-            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "CopperUI",
                 MessageBoxButton.OK);
             return;
         }
@@ -166,25 +154,6 @@ public partial class CGTMainWindow : Window
         }
     }
 
-    // Appends a text to the LogBox.
-    private void Log(string text)
-    {
-        LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
-    }
-    
-    private void Log(string text, bool usePrefix)
-    {
-        switch (usePrefix)
-        {
-            case true:
-                LogBox.AppendText($"{EditorDefaultLogPrefix} {text}\n");
-                break;
-            case false:
-                LogBox.AppendText($"{text}\n");
-                break;
-        }
-    }
-
     // Opens the file exlorer in the directory of the pkf.
     private void RevealInExplorer()
     {
@@ -206,19 +175,15 @@ public partial class CGTMainWindow : Window
     {
         if (ProjectBuilder == null) return;
 
-        Log("Building project...");
         var build = ProjectBuilder?.Build();
 
         switch (build?.ResultType)
         {
             case CGTProjBuilderResultType.DoneNoErrors:
-                Log("Project build without any errors.");
                 break;
             case CGTProjBuilderResultType.DoneWithErrors:
-                Log("Project build with errors.");
                 break;
             case CGTProjBuilderResultType.FailedWithErrors:
-                Log("Project build failed with errors.");
                 MessageBox.Show("Build failed with errors.");
                 break;
         }
@@ -230,21 +195,13 @@ public partial class CGTMainWindow : Window
     private void PostStartup()
     {
         ToggleEditor();
-
-        LoadPkfFile();
     }
 
     // Defines what should happen after loading a PKF.
     private void PostLoad()
     {
-        Log($"Opening {CurrentFile?.Name}");
         ToggleEditor();
         TogglePkfButtons();
-        if (CurrentFileHasLog)
-        {
-            LogBox.Clear();
-            Log(File.ReadAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}"), false);
-        }
         CheckPkfFile();
         PrepareOutline();
     }
@@ -252,38 +209,29 @@ public partial class CGTMainWindow : Window
     // Defines what should happen after unloading a PKF.
     private void PostUnload()
     {
-        Log($"Unloading {CurrentFile?.Name}");
         ToggleEditor();
         TogglePkfButtons();
         CurrentFile = null;
         ProjectBuilder = null;
-        CurrentFileHasLog = false;
         Outline.Items.Clear();
         Editor.Clear();
-        LogBox.Clear();
     }
 
     /** ------------------------------ Action Methods ------------------------------ */
     
     // Saves the current PKF.
-    private void SavePkfFile()
+    private void SavePkfFile(bool silent)
     {
         if (CurrentFile == null)
         {
-            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "CopperUI",
                 MessageBoxButton.OK);
             return;
         }
 
         File.WriteAllText(CurrentFile.FullName, Editor.Text);
-        Log($"Saving {CurrentFile.FullName}");
-        if (CurrentFileHasLog)
-        {
-            File.WriteAllText(CurrentFileDir?.FullName + EditorDefaultLogSavePath, LogBox.Text);
-        }
         CheckPkfFile();
         PrepareOutline();
-        SaveLog(true);
     }
 
     // Loads a PKF
@@ -309,33 +257,16 @@ public partial class CGTMainWindow : Window
         }
         catch (System.Exception)
         {
-            MessageBox.Show("Failed to load PKF-File!", "Copper Game Tools UI", MessageBoxButton.OK,
+            MessageBox.Show("Failed to load PKF-File!", "CopperUI", MessageBoxButton.OK,
                 MessageBoxImage.None);
             throw;
         }
 
-        CurrentFileHasLog = File.Exists($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
-
-        Title = $"Copper Game Tools UI | {CurrentFile.Name}";
+        Title = $"CopperUI | {CurrentFile.Name}";
 
         Editor.Text = File.ReadAllText(CurrentFile.FullName);
 
         PostLoad();
-    }
-    
-    // Saves the LogBox
-    private void SaveLog(bool isSilent)
-    {
-        Directory.CreateDirectory(CurrentFileDir?.FullName + "/.coppui/");
-        if (!isSilent) Log($"Saved LogBox to {CurrentFileDir?.FullName}{EditorDefaultLogSavePath}");
-        File.WriteAllText($"{CurrentFileDir?.FullName}{EditorDefaultLogSavePath}",
-            LogBox.Text);
-    }
-    
-    // Clears the log
-    private void ClearLog()
-    {
-        LogBox.Clear();
     }
 
     /** ------------------------------ MenuItem Click Event Handlers ------------------------------ */
@@ -347,19 +278,19 @@ public partial class CGTMainWindow : Window
 
     private void SaveClickEvent(object sender, RoutedEventArgs e)
     {
-        SavePkfFile();
+        SavePkfFile(false);
     }
 
     private void UnloadClickEvent(object sender, RoutedEventArgs e)
     {
         if (CurrentFile == null)
         {
-            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "Copper Game Tools UI",
+            MessageBox.Show("Please open a Project Key File (*.pkf) first.", "CopperUI",
                 MessageBoxButton.OK);
             return;
         }
 
-        Title = $"Copper Game Tools UI";
+        Title = $"CopperUI";
         PostUnload();
     }
 
@@ -378,12 +309,12 @@ public partial class CGTMainWindow : Window
             }
 
             switch (MessageBox.Show($"Save {CurrentFile.Name} before closing? (Unsaved changes will be lost!)",
-                        "Copper Game Tools UI",
+                        "CopperUI",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question))
             {
                 case MessageBoxResult.Yes:
-                    SavePkfFile();
+                    SavePkfFile(false);
                     this.Close();
                     break;
                 case MessageBoxResult.No:
@@ -398,27 +329,12 @@ public partial class CGTMainWindow : Window
         BuildProject();
     }
 
-    private void CheckPkfClickEvent(object sender, RoutedEventArgs e)
-    {
-        CheckPkfFile();
-    }
-
-    private void SaveLogClickEvent(object sender, RoutedEventArgs e)
-    {
-        SaveLog(true);
-    }
-
-    private void ClearLogClickEvent(object sender, RoutedEventArgs e)
-    {
-        ClearLog();
-    }
-
     private void AboutMenuItemClickEvent(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"Copper Game Tools UI aka. CopperUI v0.1.2 made by Nils 'AGBDev' Boehm. \n" +
+        MessageBox.Show($"CopperUI aka. CopperUI v0.1.2 made by Nils 'AGBDev' Boehm. \n" +
                         $"This Software is only to be used by licensed employees from AGBgames.\n" +
                         $"It is not to be shared outside of AGBgames.", 
-            "Copper Game Tools UI",
+            "CopperUI",
             MessageBoxButton.OK,
             MessageBoxImage.Asterisk);
     }
@@ -431,5 +347,18 @@ public partial class CGTMainWindow : Window
     private void FastEditKeyClickEvent(object sender, RoutedEventArgs e)
     {
         FastEditKey();
+    }
+
+    private void Editor_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (CurrentFile == null) return;
+        SavePkfFile(true);
+        PrepareOutline();
+    }
+
+    private void OptionsClickEvent(object sender, RoutedEventArgs e)
+    {
+        var options = new Settings();
+        options.Show();
     }
 }

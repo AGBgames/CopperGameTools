@@ -5,62 +5,56 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
-        Title="Copper Game Tools UI" Height="720" Width="1120"
-        ResizeMode="NoResize">
+        Title="Copper Game Tools UI" Height="790" Width="1120" WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterScreen" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF2B2424">
     <Window.InputBindings>
         <KeyBinding Command="{Binding LoadPkfFileCommand}" Key="F3"/>
+        <KeyBinding Command="{Binding FastEditKeyCommand}" Key="F5"/>
         <KeyBinding Command="{Binding SavePkfFileCommand}" Key="F4"/>
-        <KeyBinding Command="{Binding RevealPkfFileCommand}" Key="F7"/>
-        <KeyBinding Command="{Binding LogSaveCommand}" Key="F5"/>
-        <KeyBinding Command="{Binding LogClearCommand}" Key="F6"/>
-        <KeyBinding Command="{Binding FastEditKeyCommand}" Key="F2"/>
-        <KeyBinding Command="{Binding BuildProjectCommand}" Key="F8"></KeyBinding>
+        <KeyBinding Command="{Binding RevealPkfFileCommand}" Key="F6"/>
+        <KeyBinding Command="{Binding BuildProjectCommand}" Key="F7"/>
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="370"/>
+            <RowDefinition Height="390"/>
             <RowDefinition Height="230"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>    
-            <ColumnDefinition Width="300"></ColumnDefinition>      
-            <ColumnDefinition Width="800"></ColumnDefinition>      
-        </Grid.ColumnDefinitions>    
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"></ColumnDefinition>
+            <ColumnDefinition Width="890"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Load | F3" x:Name="LoadMenuItem"  IsEnabled="true" Click="LoadClickEvent"/>
                 <MenuItem Header="Unload" x:Name="UnloadMenuItem"  IsEnabled="false" Click="UnloadClickEvent"/>
-                <MenuItem Header="" IsEnabled="false"/>
                 <MenuItem Header="Save | F4" x:Name="SaveMenuItem" IsEnabled="false" Click="SaveClickEvent"/>
-                <MenuItem Header="Reveal in Explorer | F7" x:Name="RevealInExplorerMenuItem" IsEnabled="false" Click="RevealInExplorerClickEvent"/>
-                <MenuItem Header="" IsEnabled="false"/>
+                <MenuItem Header="Reveal in Explorer | F6" x:Name="RevealInExplorerMenuItem" IsEnabled="false" Click="RevealInExplorerClickEvent"/>
                 <MenuItem Header="Quit" IsEnabled="true" Click="QuitClickEvent"/>
             </MenuItem>
             <MenuItem Header="Tools">
-                <MenuItem Header="Build Project" x:Name="BuildProjectMenuItem" IsEnabled="false" Click="BuildProjectClickEvent"/>
-                <MenuItem Header="Check PKF" x:Name="CheckPkfMenuItem" IsEnabled="false" Click="CheckPkfClickEvent"/>
-                <MenuItem Header="Log" x:Name="LogMenuItem" IsEnabled="true">
-                    <MenuItem Header="Clear | F6" x:Name="ClearLogMenuItem" IsEnabled="true" Click="ClearLogClickEvent"></MenuItem>
-                    <MenuItem Header="Save | F5" x:Name="SaveLogMenuItem" IsEnabled="true" Click="SaveLogClickEvent"></MenuItem>
-                </MenuItem>
-                <MenuItem Header="Add Key | F2" x:Name="FastEditKeyMenuItem" IsEnabled="false" Click="FastEditKeyClickEvent"/>
+                <MenuItem Header="Build Project | F7" x:Name="BuildProjectMenuItem" IsEnabled="false" Click="BuildProjectClickEvent"/>
+                <MenuItem Header="Add Key | F5" x:Name="FastEditKeyMenuItem" IsEnabled="false" Click="FastEditKeyClickEvent"/>
+                <MenuItem Header="Options" x:Name="OptionsMenuItem" IsEnabled="true" Click="OptionsClickEvent"/>
             </MenuItem>
             <MenuItem Header="Info">
                 <MenuItem Header="About" x:Name="AboutMenuItem" Click="AboutMenuItemClickEvent"></MenuItem>
             </MenuItem>
         </Menu>
 
-        <TreeView Grid.Row="1" Grid.Column="0" x:Name="Outline" Width="300">
-            
+        <TreeView Cursor="Hand" Grid.Row="1" Grid.Column="0" x:Name="Outline" Width="300" VerticalAlignment="Top" HorizontalAlignment="Left">
         </TreeView>
 
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="Editor" TextWrapping="Wrap" AcceptsReturn="True" Width="800" IsEnabled="true" VerticalScrollBarVisibility="Visible" 
-                 FontSize="16" FontFamily="Consolas" UndoLimit="30" IsUndoEnabled="True"></TextBox>
-
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="LogBox" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"
-                 FontSize="13" FontFamily="Consolas"></TextBox>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="Errors" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"></TextBox>
+                 FontSize="15" FontFamily="Consolas" UndoLimit="30" IsUndoEnabled="True" 
+                 VerticalAlignment="Top" HorizontalAlignment="Right"
+                 TextChanged="Editor_TextChanged">
+        </TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="Errors" IsEnabled="true" TextWrapping="Wrap" Width="800" VerticalScrollBarVisibility="Visible"
+                 HorizontalAlignment="Right"
+                 FontSize="12" FontFamily="Consolas">
+        </TextBox>
     </Grid>
 </Window>

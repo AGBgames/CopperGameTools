@@ -65,7 +65,7 @@ public class CGTProjFile
         foreach (var err in FileCheck().ResultErrors)
         {
             System.Console.WriteLine(
-                "{err.ErrorText} | ErrorType -> {err.ErrorType} | Is Critical -> {err.IsCritical}"
+                $"{err.ErrorText} | ErrorType -> {err.ErrorType} | Is Critical -> {err.IsCritical}"
             );
         }
     }

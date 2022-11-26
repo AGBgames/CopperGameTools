@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
         Title="Copper Game Tools UI - Fast Edit Key" Height="230" Width="450"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize" WindowStyle="ToolWindow">
         <StackPanel>
             <Label Content="Add New?" HorizontalAlignment="Center"/>
-            <CheckBox x:Name="AddNew" HorizontalAlignment="Center"/>
+            <RibbonCheckBox x:Name="AddNew" HorizontalAlignment="Center"/>
             <Label Content="New Key Name" HorizontalAlignment="Center"/>
             <TextBox Width="200" MaxLength="100" x:Name="NewKeyName"/>
             <Label Content="New Key Value" HorizontalAlignment="Center"/>
