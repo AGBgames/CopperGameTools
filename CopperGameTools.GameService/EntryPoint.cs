@@ -5,6 +5,8 @@ namespace CopperGameTools.GameService;
 class EntryPoint {
     public static void Main(String[] args) {
         if (args.Length == 0) return;
+
+        // handle game process
         var gameProcess = new Process();
         gameProcess.StartInfo.FileName = args[0];
         gameProcess.StartInfo.UseShellExecute = false;

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.Builder", "CopperGameTools.Builder\CopperGameTools.Builder.csproj", "{E4C7EED2-DE4E-4C1A-97DB-746048FD6DAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CopperGameTools.Builder", "CopperGameTools.Builder\CopperGameTools.Builder.csproj", "{E4C7EED2-DE4E-4C1A-97DB-746048FD6DAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.CopperUI", "CopperGameTools.CopperUI\CopperGameTools.CopperUI.csproj", "{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CopperGameTools.CopperUI", "CopperGameTools.CopperUI\CopperGameTools.CopperUI.csproj", "{7FA9F63C-7CC9-477A-86C7-B10C66422A0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.CLI", "CopperGameTools.CLI\CopperGameTools.CLI.csproj", "{03506596-B408-4D99-A827-C3577CF9EF7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CopperGameTools.CLI", "CopperGameTools.CLI\CopperGameTools.CLI.csproj", "{03506596-B408-4D99-A827-C3577CF9EF7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopperGameTools.GameService", "CopperGameTools.GameService\CopperGameTools.GameService.csproj", "{5D6E58E1-7444-4FD1-8619-239B13B39D69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CopperGameTools.GameService", "CopperGameTools.GameService\CopperGameTools.GameService.csproj", "{5D6E58E1-7444-4FD1-8619-239B13B39D69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

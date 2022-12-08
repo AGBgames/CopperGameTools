@@ -22,3 +22,9 @@ C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\obj\Debu
 C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\obj\Debug\net6.0\refint\CopperGameTools.Builder.dll
 C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\obj\Debug\net6.0\CopperGameTools.Builder.pdb
 C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\obj\Debug\net6.0\ref\CopperGameTools.Builder.dll
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\bin\Debug\net6.0\CopperGameTools.ContentManager.deps.json
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\bin\Debug\net6.0\CopperGameTools.ContentManager.runtimeconfig.json
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\bin\Debug\net6.0\CopperGameTools.ContentManager.exe
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\bin\Debug\net6.0\CopperGameTools.ContentManager.dll
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\bin\Debug\net6.0\CopperGameTools.ContentManager.pdb
+C:\Users\nils1\Documents\GitHub\CopperGameTools\CopperGameTools.Builder\obj\Debug\net6.0\CopperGameTools.Builder.csproj.CopyComplete

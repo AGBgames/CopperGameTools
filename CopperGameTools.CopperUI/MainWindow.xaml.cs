@@ -19,9 +19,6 @@ public partial class CGTMainWindow : Window
     
     private TreeViewItem KeysFromFile { get; }
     private TreeViewItem AssetFiles { get; }
-    
-    private string EditorDefaultLogPrefix { get; }
-    private string EditorDefaultLogSavePath { get; }
 
     public ICommand LoadPkfFileCommand { get; }
     public ICommand SavePkfFileCommand { get; }
@@ -32,8 +29,6 @@ public partial class CGTMainWindow : Window
     public CGTMainWindow()
     {
         InitializeComponent();
-        EditorDefaultLogPrefix = $"[{DateTime.Now}]: ";
-        EditorDefaultLogSavePath = "/.coppui/log.txt";
         KeysFromFile = new TreeViewItem() { Header = "Keys (Read From File)" };
         AssetFiles = new TreeViewItem() { Header = "Asset Files" };
 

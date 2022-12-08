@@ -9,12 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SplashScreen Include="FeatureWindows\SplashScreen1.png" />
+    <Folder Include="Resources\" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
