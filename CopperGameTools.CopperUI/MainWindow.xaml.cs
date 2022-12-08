@@ -115,6 +115,8 @@ public partial class CGTMainWindow : Window
     private void FastEditKeyEvent(object sender, MouseButtonEventArgs e)
     {
         var item = sender as TreeViewItem;
+
+        if (item?.Header.ToString() == null) return;
         
         var keyValue = ProjectBuilder?.ProjFile.KeyGet(item?.Header.ToString());
         var keyName = item?.Header.ToString();

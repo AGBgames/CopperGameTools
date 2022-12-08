@@ -7,10 +7,12 @@ class Program {
         if (args.Length == 0)
         {
             System.Console.WriteLine("No subcommand used. \n");
-            System.Console.WriteLine("uicl / uiclient - boots up CopperUI. \n" + 
+            System.Console.WriteLine(
+                    "uicl / uiclient - boots up CopperUI. \n" + 
                     "build - builds a .PKF-File. \n" + 
                     "checkpkf - checks a .PKF-File.\n" + 
-                    "info - shows info about the CLI and CopperGameToools.");
+                    "info - shows info about the CLI and CopperGameToools."
+            );
             return;
         }
 

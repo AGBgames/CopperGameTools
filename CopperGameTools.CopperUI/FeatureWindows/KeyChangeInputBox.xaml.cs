@@ -33,7 +33,8 @@ public partial class KeyChangeInputBox : Window
 
     private void UpdateKey()
     {
-        if ((bool)AddNew.IsChecked)
+        if (AddNew.IsChecked == null) return;
+        if ((bool)AddNew.IsChecked == true)
         {
             Editor.Text += $"\n{NewKeyName.Text}={NewKeyValue.Text}";           
         }

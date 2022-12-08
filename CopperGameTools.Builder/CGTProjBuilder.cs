@@ -60,7 +60,6 @@ public class CGTProjBuilder
 
         File.WriteAllText(outDir + sourceOut + ".js", toWrite);
         System.Console.WriteLine("Done writing " + sourceOut + ".js.");
-        System.Console.WriteLine("Packing game folder...");
         return check.ResultErrors.Count > 0 ? new CGTProjBuilderResult(CGTProjBuilderResultType.DoneWithErrors) : 
             new CGTProjBuilderResult(CGTProjBuilderResultType.DoneNoErrors);
     }
