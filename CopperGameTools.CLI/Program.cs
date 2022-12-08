@@ -4,11 +4,12 @@ namespace CopperGameTools.CLI;
 
 class Program {
     public static void Main(String[] args) {
+        // No subcommand used / no args?
         if (args.Length == 0)
         {
             System.Console.WriteLine("No subcommand used. \n");
             System.Console.WriteLine(
-                    "uicl / uiclient - boots up CopperUI. \n" + 
+                    "coppui - boots up CopperUI. \n" + 
                     "build - builds a .PKF-File. \n" + 
                     "checkpkf - checks a .PKF-File.\n" + 
                     "info - shows info about the CLI and CopperGameToools."
@@ -19,10 +20,9 @@ class Program {
         switch (args[0])
         {
             case "info":
-                System.Console.WriteLine("CopperGameTools Command Line Interface v0.232.1");
+                System.Console.WriteLine("CopperGameTools Command Line Interface v0.3");
                 break;
-            case "uicl":
-            case "uiclient":
+            case "coppui":
                 var uiProc = new System.Diagnostics.Process();
                 uiProc.StartInfo.FileName = "CopperGameTools.CopperUI.exe";
                 uiProc.Start();
