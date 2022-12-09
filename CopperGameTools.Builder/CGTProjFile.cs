@@ -8,6 +8,7 @@ public class CGTProjFile
 {
     public FileInfo SourceFile { get; }
     public List<CGTProjFileKey> FileKeys { get; set; }
+    public string[] CriticalKeys { get; set; }
 
     public CGTProjFile(FileInfo sourceFile)
     {
@@ -16,6 +17,15 @@ public class CGTProjFile
 
         SourceFile = sourceFile;
         FileKeys = new List<CGTProjFileKey>();
+        CriticalKeys = new[]
+        {
+            "project.name",
+            "project.src.dir",
+            "project.src.out",
+            "project.out.dir",
+            "project.src.main",
+            "project.src.args"
+        };
 
         AddKeys();
     }
@@ -75,17 +85,6 @@ public class CGTProjFile
     {
         var errors = new List<CGTProjFileCheckError>();
         var lineNumber = 1;
-        var criticalKeys = new[]
-        {
-            "project.name", 
-            "project.src.dir", 
-            "project.out.dir", 
-            "project.out.name",
-            "project.out.version",
-            "project.platform",
-            "project.platform.cache",
-            "project.platform.cache.path"
-        };
 
         var readKeys = new List<CGTProjFileKey>();
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
@@ -98,14 +97,14 @@ public class CGTProjFile
             
             if (!line.Contains('='))
             {
-                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidKey, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
                 lineNumber++;
                 continue;
             }
             
             if (line.Split('=')[1] == "")
             {
-                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidValue, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.InvalidValue, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
                 lineNumber++;
                 continue;
             }
@@ -118,7 +117,7 @@ public class CGTProjFile
             {
                 if (key.Key == keyToAdd.Key)
                 {
-                    errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.DuplicatedKey, IsCritic(line, criticalKeys), $"[{lineNumber}] {line}"));
+                    errors.Add(new CGTProjFileCheckError(CGTProjFileCheckErrorType.DuplicatedKey, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
                     lineNumber++;
                     continue;
                 }
@@ -144,6 +143,8 @@ public class CGTProjFile
 
         return isCritic;
     }
+    
+    //TODO: update systems to improve performance ~AGBDev
 
     private void AddKeys()
     {

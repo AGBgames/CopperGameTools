@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CopperGameTools.CopperUI"
         mc:Ignorable="d"
-        Title="Copper Game Tools UI" Height="790" Width="1120" WindowStyle="ToolWindow"
+        Title="CopperUI" Height="790" Width="1120" WindowStyle="ToolWindow"
         WindowStartupLocation="CenterScreen" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF2B2424">
     <Window.InputBindings>
         <KeyBinding Command="{Binding LoadPkfFileCommand}" Key="F3"/>

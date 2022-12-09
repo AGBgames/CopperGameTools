@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace CopperGameTools.Builder;
 
 public class CGTProjBuilder

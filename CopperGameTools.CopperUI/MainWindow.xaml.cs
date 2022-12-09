@@ -328,7 +328,7 @@ public partial class CGTMainWindow : Window
 
     private void AboutMenuItemClickEvent(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"CopperUI aka. CopperUI v0.1.2 made by Nils 'AGBDev' Boehm. \n" +
+        MessageBox.Show($"CopperUI v0.2.1 (8.12.2022)| Programmed by Nils 'AGBDev' Boehm. \n" +
                         $"This Software is only to be used by licensed employees from AGBgames.\n" +
                         $"It is not to be shared outside of AGBgames.", 
             "CopperUI",
