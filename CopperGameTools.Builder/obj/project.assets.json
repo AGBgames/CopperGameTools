@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net7.0": {}
+    "net7.0": {
+      "CopperGameTools.ContentPacker/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/CopperGameTools.ContentPacker.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CopperGameTools.ContentPacker.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "CopperGameTools.ContentPacker/1.0.0": {
+      "type": "project",
+      "path": "../CopperGameTools.ContentPacker/CopperGameTools.ContentPacker.csproj",
+      "msbuildProject": "../CopperGameTools.ContentPacker/CopperGameTools.ContentPacker.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net7.0": []
+    "net7.0": [
+      "CopperGameTools.ContentPacker >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\nils1\\.nuget\\packages\\": {}
@@ -33,7 +52,11 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.ContentPacker\\CopperGameTools.ContentPacker.csproj": {
+              "projectPath": "C:\\Users\\nils1\\Documents\\GitHub\\CopperGameTools\\CopperGameTools.ContentPacker\\CopperGameTools.ContentPacker.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

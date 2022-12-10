@@ -58,6 +58,13 @@ public class CGTProjBuilder
 
         File.WriteAllText(outDir + sourceOut + ".js", toWrite);
         System.Console.WriteLine("Done writing " + sourceOut + ".js.");
+
+        System.Console.WriteLine("Packing content folder...");
+        var folder = ProjFile.KeyGet("project.externalres.dir");
+        if (folder != "")
+        {
+            ContentPacker.ContentPacker.Pack(Path.GetFullPath(folder), projectName.ToLower());
+        }
         return check.ResultErrors.Count > 0 ? new CGTProjBuilderResult(CGTProjBuilderResultType.DoneWithErrors) : 
             new CGTProjBuilderResult(CGTProjBuilderResultType.DoneNoErrors);
     }
