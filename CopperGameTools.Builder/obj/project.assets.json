@@ -4,7 +4,7 @@
     "net7.0": {
       "CopperGameTools.ContentPacker/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
+        "framework": ".NETCoreApp,Version=v7.0",
         "compile": {
           "bin/placeholder/CopperGameTools.ContentPacker.dll": {}
         },

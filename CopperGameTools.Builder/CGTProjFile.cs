@@ -17,6 +17,8 @@ public class CGTProjFile
 
         SourceFile = sourceFile;
         FileKeys = new List<CGTProjFileKey>();
+
+        // Add all keys that should cause an critical error (when not used properly)
         CriticalKeys = new[]
         {
             "project.name",

@@ -6,14 +6,14 @@ public class ContentPacker
 	public static void Pack(string path, string name)
 	{
         if (File.Exists(name + ".cgc")) File.Delete(name + ".cgc");
-		var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+        string[] content_files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
 
         using ZipArchive zip = ZipFile.Open(name + ".cgc", ZipArchiveMode.Create);
-        foreach (var item in files)
+        foreach (var content_file in content_files)
         {
-            var nameg = Path.GetFileName(item);
-            zip.CreateEntryFromFile(item, nameg);
-            Console.WriteLine("Written " + nameg + " to cgc.");
+            var name_current_file = Path.GetFileName(content_file);
+            zip.CreateEntryFromFile(content_file, name_current_file);
+            Console.WriteLine("Written " + name_current_file + " to cgc.");
         }
     }
 
@@ -22,15 +22,15 @@ public class ContentPacker
         Directory.CreateDirectory("~content");
 
         using ZipArchive zip = ZipFile.Open(contentFile + ".cgc", ZipArchiveMode.Read);
-        System.Console.WriteLine("Unpacking content to directory...");
+        Console.WriteLine("Unpacking content to directory...");
         zip.ExtractToDirectory("~content");
-        System.Console.WriteLine("Done!");
+        Console.WriteLine("Done!");
     }
 
 	public static void Clean()
 	{
-        System.Console.WriteLine("Cleaning up content-directory...");
+        Console.WriteLine("Cleaning up content-directory...");
 		Directory.Delete("~content", true);
-        System.Console.WriteLine("Done!");
+        Console.WriteLine("Done!");
 	}
 }
