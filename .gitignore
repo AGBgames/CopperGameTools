@@ -10,7 +10,8 @@
 *.userosscache
 *.sln.docstates
 
-pack.bat
+pack_global.bat
+pack_testgame.bat
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

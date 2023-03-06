@@ -22,11 +22,15 @@ public class ContentPacker
         Directory.CreateDirectory("~content");
 
         using ZipArchive zip = ZipFile.Open(contentFile + ".cgc", ZipArchiveMode.Read);
+        System.Console.WriteLine("Unpacking content to directory...");
         zip.ExtractToDirectory("~content");
+        System.Console.WriteLine("Done!");
     }
 
 	public static void Clean()
 	{
+        System.Console.WriteLine("Cleaning up content-directory...");
 		Directory.Delete("~content", true);
+        System.Console.WriteLine("Done!");
 	}
 }

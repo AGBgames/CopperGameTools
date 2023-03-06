@@ -6,6 +6,9 @@ class EntryPoint {
     public static void Main(String[] args) {
         if (args.Length == 0) return;
 
+        System.Console.WriteLine("GameService v0.1.2");
+
+        // Unpack content
         ContentPacker.ContentPacker.Unpack(args[1]);
 
         // handle game process

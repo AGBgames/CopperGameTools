@@ -25,7 +25,7 @@ public class CGTProjBuilder
         var outDir = Path.Combine(ProjFile.SourceFile.DirectoryName, ProjFile.KeyGet("project.out.dir"));
         var mainFile = sourceDir + ProjFile.KeyGet("project.src.main");
 
-        var argsList = new string[]{};
+        var argsList = Array.Empty<string>();
 
         if (ProjFile.KeyGet("project.src.args") != "")
         {
@@ -56,6 +56,8 @@ public class CGTProjBuilder
 
         toWrite += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
 
+        if (!Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
         File.WriteAllText(outDir + sourceOut + ".js", toWrite);
         System.Console.WriteLine("Done writing " + sourceOut + ".js.");
 
