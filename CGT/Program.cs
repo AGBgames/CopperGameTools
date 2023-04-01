@@ -22,7 +22,7 @@ namespace CopperGameTools.CLI
             switch (args[0])
             {
                 case "info":
-                    Console.WriteLine("CopperGameTools v0.4");
+                    Console.WriteLine("CopperGameTools v0.4.1");
                     break;
                 case "build":
                     if (args.Length < 2)
@@ -30,23 +30,30 @@ namespace CopperGameTools.CLI
                         Console.WriteLine("build <pkf-file>");
                         return;
                     }
-                    ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
-                    switch (builder.Build().ResultType)
+                    try
                     {
-                        case ProjBuilderResultType.DoneNoErrors:
-                            Console.WriteLine("No errors found.");
-                            break;
-                        case ProjBuilderResultType.DoneWithErrors:
-                            Console.WriteLine("Errors found.");
-                            builder.ProjFile.PrintErros();
-                            break;
-                        case ProjBuilderResultType.FailedNoErrors:
-                            Console.WriteLine("Failed with no errors.");
-                            break;
-                        case ProjBuilderResultType.FailedWithErrors:
-                            Console.WriteLine("Failed with errors");
-                            builder.ProjFile.PrintErros();
-                            break;
+                        ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
+                        switch (builder.Build().ResultType)
+                        {
+                            case ProjBuilderResultType.DoneNoErrors:
+                                Console.WriteLine("No errors found.");
+                                break;
+                            case ProjBuilderResultType.DoneWithErrors:
+                                Console.WriteLine("Errors found.");
+                                builder.ProjFile.PrintErros();
+                                break;
+                            case ProjBuilderResultType.FailedNoErrors:
+                                Console.WriteLine("Failed with no errors.");
+                                break;
+                            case ProjBuilderResultType.FailedWithErrors:
+                                Console.WriteLine("Failed with errors");
+                                builder.ProjFile.PrintErros();
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to load file!");
                     }
                     break;
                 case "checkpkf":
@@ -55,10 +62,17 @@ namespace CopperGameTools.CLI
                         Console.WriteLine("checkpkf <pkf-file>");
                         return;
                     }
-                    ProjFileCheckResult checkRes = new ProjBuilder(new ProjFile(new FileInfo(args[1]))).ProjFile.FileCheck();
-                    foreach (var err in checkRes.ResultErrors)
+                    try
                     {
-                        Console.WriteLine($"{err.ErrorText} | Type => {err.ErrorType} | Is Critical => {err.IsCritical}\n");
+                        ProjFileCheckResult checkRes = new ProjBuilder(new ProjFile(new FileInfo(args[1]))).ProjFile.FileCheck();
+                        foreach (var err in checkRes.ResultErrors)
+                        {
+                            Console.WriteLine($"{err.ErrorText} | Type => {err.ErrorType} | Is Critical => {err.IsCritical}\n");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to load file!");
                     }
                     break;
             }

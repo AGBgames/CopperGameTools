@@ -4,9 +4,9 @@ namespace CopperGameTools.ContentPacker
 {
     public class ContentPacker
     {
-        /*
-         * Packs the files off the given folder into a .cgc file.
-         */
+        /// <summary>
+        /// Packs all the files from the project.externalres.dir-folder into a ZIP like file.
+        /// </summary>
         public static void Pack(string path, string name, string outDir)
         {
             if (!Directory.Exists(path))
@@ -18,30 +18,30 @@ namespace CopperGameTools.ContentPacker
             if (File.Exists(outDir + name + ".cgc"))
                 File.Delete(outDir + name + ".cgc");
 
-            string[] content_files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            string[] contentFiles = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
 
-            string[] supportedFileFormats = { "txt", "png", "bmp" };
+            string[] supportedFileFormats = { "txt", "png", "bmp", "pck" };
 
             ZipArchive zip = ZipFile.Open(outDir + name + ".cgc", ZipArchiveMode.Create);
-            foreach (var content_file in content_files)
+            foreach (var contentFile in contentFiles)
             {
-                string fileFormat = content_file.Split(".")[content_file.Split(".").Length - 1];
+                string fileFormat = contentFile.Split(".")[contentFile.Split(".").Length - 1];
 
                 if (!supportedFileFormats.Contains(fileFormat))
                 {
-                    Console.WriteLine($"Fileformat of {content_file} is not supported!");
+                    Console.WriteLine($"Fileformat of {contentFile} is not supported, skipping...");
                     continue;
                 }
 
-                var name_current_file = Path.GetFileName(content_file);
-                zip.CreateEntryFromFile(content_file, name_current_file);
-                Console.WriteLine("Written " + name_current_file + " to cgc.");
+                var nameOfCurrentFile = Path.GetFileName(contentFile);
+                zip.CreateEntryFromFile(contentFile, nameOfCurrentFile);
+                Console.WriteLine("Written " + nameOfCurrentFile + " to cgc.");
             }
         }
 
-        /*
-         * Unpacks a .cgc file and puts its files into a Data folder
-         */
+        /// <summary>
+        /// Unpacks the packed files into the Data folder.
+        /// </summary>
         public static void Unpack(string contentFile)
         {
             if (!Directory.Exists("Data")) { Directory.CreateDirectory("Data"); }
@@ -58,9 +58,9 @@ namespace CopperGameTools.ContentPacker
             Console.WriteLine("Done!");
         }
 
-        /*
-         * Deletes the Data folder.
-         */
+        /// <summary>
+        /// Deletes up the Data folder.
+        /// </summary>
         public static void Clean()
         {
             Console.WriteLine("Cleaning up content-directory...");

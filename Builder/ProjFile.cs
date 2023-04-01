@@ -8,25 +8,16 @@ namespace CopperGameTools.Builder
 
         public ProjFile(FileInfo sourceFile)
         {
-            if (sourceFile.Exists && sourceFile != null)
+            if (!sourceFile.Exists || sourceFile == null)
             {
-                SourceFile = sourceFile;
-            }
-            else
-            {
-                bool s = false;
-                while (!s)
-                {
-                    Console.WriteLine("File not found, please enter other filename: ");
-                    string filename = Console.ReadLine();
-                    if (filename != null && File.Exists(filename))
-                    {
-                        SourceFile = new FileInfo(filename);
-                        break;
-                    }
-                }
+                SourceFile = new FileInfo("");
+                FileKeys = new List<ProjFileKey>();
+                CriticalKeys = new[] {""};
+                Console.WriteLine("Failed to load file: File not found!");
+                return;
             }
 
+            SourceFile = sourceFile;
             FileKeys = new List<ProjFileKey>();
 
             // Add all keys that should cause an critical error (when not used properly)
@@ -37,8 +28,10 @@ namespace CopperGameTools.Builder
             "project.src.out",
             "project.out.dir",
             "project.src.main",
-            "project.src.args"
-        };
+            "project.src.args",
+            "project.externalres.dir",
+            "project.externalres.out"
+            };
 
             AddKeys();
         }
@@ -74,6 +67,11 @@ namespace CopperGameTools.Builder
             return "";
         }
 
+        /// <summary>
+        /// Gets a Key From a Specific Line.
+        /// </summary>
+        /// <param name="line">Line to Get The Key From.</param>
+        /// <returns></returns>
         public string KeyGet(int line)
         {
             foreach (var key in FileKeys)
@@ -87,13 +85,17 @@ namespace CopperGameTools.Builder
         {
             foreach (var err in FileCheck().ResultErrors)
             {
-                System.Console.WriteLine(
+                Console.WriteLine(
                     $"{err.ErrorText} | ErrorType -> {err.ErrorType} | Is Critical -> {err.IsCritical}"
                 );
             }
         }
 
-        // Checks the file for errors (invalid comments and keys etc)
+        /// <summary>
+        /// Initiates a Check of the Projectfile.
+        /// </summary>
+        /// <returns>A ProjFileCheckResult. Result varies in case of errors.</returns>
+        /// <see cref="ProjBuilderResultType"/>
         public ProjFileCheckResult FileCheck()
         {
             var errors = new List<ProjFileCheckError>();
@@ -157,8 +159,9 @@ namespace CopperGameTools.Builder
             return isCritic;
         }
 
-        //TODO: update systems to improve performance ~AGBDev
-
+        /// <summary>
+        /// Rescans the Projectfile and Reads all valid Keys.
+        /// </summary>
         private void AddKeys()
         {
             var lineNumber = 1;
@@ -173,6 +176,10 @@ namespace CopperGameTools.Builder
 
     #region File Check
 
+    /// <summary>
+    /// Class-Wrapper for ProjFileCheckResult
+    /// </summary>
+    /// <seealso cref="ProjFileCheckError"/>
     public class ProjFileCheckResult
     {
         public ProjFileCheckResult(CGTProjFileCheckResultType resultType, List<ProjFileCheckError> resultErrors)
@@ -195,6 +202,10 @@ namespace CopperGameTools.Builder
 
     #region File Check Error
 
+    /// <summary>
+    /// Class-Wrappper for ProjFileCheckErrorType.
+    /// </summary>
+    /// <see cref="ProjFileCheckErrorType"/>
     public class ProjFileCheckError
     {
         public ProjFileCheckError(ProjFileCheckErrorType errorType, bool isCritical, string errorText)
@@ -209,6 +220,9 @@ namespace CopperGameTools.Builder
         public string ErrorText { get; }
     }
 
+    /// <summary>
+    /// All Types of Projectfile Checking Errors.
+    /// </summary>
     public enum ProjFileCheckErrorType
     {
         InvalidKey,
