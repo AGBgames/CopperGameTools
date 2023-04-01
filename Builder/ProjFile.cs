@@ -38,13 +38,16 @@ namespace CopperGameTools.Builder
 
         public void ReloadKeys()
         {
-            if (!SourceFile.Exists)
-                throw new IOException("Source File does not exist!");
-
-            FileKeys.Clear();
-            FileKeys = new List<ProjFileKey>();
-
-            AddKeys();
+            try
+            {
+                FileKeys.Clear();
+                FileKeys = new List<ProjFileKey>();
+                AddKeys();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Error while loading keys!");
+            }
         }
 
         public string KeyGet(string searchKey)
