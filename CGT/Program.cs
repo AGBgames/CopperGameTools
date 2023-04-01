@@ -51,7 +51,7 @@ namespace CopperGameTools.CLI
                                 break;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Console.WriteLine("Failed to load file!");
                     }
@@ -70,7 +70,7 @@ namespace CopperGameTools.CLI
                             Console.WriteLine($"{err.ErrorText} | Type => {err.ErrorType} | Is Critical => {err.IsCritical}\n");
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Console.WriteLine("Failed to load file!");
                     }
