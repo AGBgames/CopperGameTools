@@ -8,7 +8,7 @@ Set of tools to ease the development of games using the CopperCube Game Engine.
 
 ## CGT
 
-- Command line tool used to build a project.
+- Command line tool used to build a project and check a .pkf file.
 
 ## ContentPacker
 
