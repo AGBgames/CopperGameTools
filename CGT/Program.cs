@@ -10,12 +10,8 @@ namespace CopperGameTools.CLI
             // No subcommand used / no args?
             if (args.Length == 0)
             {
-                Console.WriteLine("CopperGameTools v0.4.1 \n" +
+                Console.WriteLine($"CopperGameTools v{Builder.Utils.GetVersion()} \n" +
                     "No subcommand used.\n");
-                Console.WriteLine(
-                        "build - builds a .PKF-File. \n" +
-                        "checkpkf - checks a .PKF-File.\n"
-                );
                 return;
             }
 
