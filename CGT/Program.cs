@@ -10,12 +10,9 @@ namespace CopperGameTools.CLI
             // No subcommand used / no args?
             if (args.Length == 0)
             {
-                Console.WriteLine("CopperGameTools v0.4.1 \n" +
+                Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} \n" +
+                    $"Copyright: {Utils.GetCopyright()}\n" +
                     "No subcommand used.\n");
-                Console.WriteLine(
-                        "build - builds a .PKF-File. \n" +
-                        "checkpkf - checks a .PKF-File.\n"
-                );
                 return;
             }
 
@@ -30,6 +27,7 @@ namespace CopperGameTools.CLI
                     try
                     {
                         ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
+                        ProjFileCheckResult projFileCheckResult = builder.ProjFile.FileCheck();
                         switch (builder.Build().ResultType)
                         {
                             case ProjBuilderResultType.DoneNoErrors:
@@ -37,14 +35,14 @@ namespace CopperGameTools.CLI
                                 break;
                             case ProjBuilderResultType.DoneWithErrors:
                                 Console.WriteLine("Errors found.");
-                                builder.ProjFile.PrintErros();
+                                Utils.PrintErrors(projFileCheckResult);
                                 break;
                             case ProjBuilderResultType.FailedNoErrors:
                                 Console.WriteLine("Failed with no errors.");
                                 break;
                             case ProjBuilderResultType.FailedWithErrors:
                                 Console.WriteLine("Failed with errors");
-                                builder.ProjFile.PrintErros();
+                                Utils.PrintErrors(projFileCheckResult);
                                 break;
                         }
                     }
@@ -53,19 +51,16 @@ namespace CopperGameTools.CLI
                         Console.WriteLine("Failed to load file!");
                     }
                     break;
-                case "checkpkf":
+                case "check":
                     if (args.Length < 2)
                     {
-                        Console.WriteLine("checkpkf <pkf-file>");
+                        Console.WriteLine("check <pkf-file>");
                         return;
                     }
                     try
                     {
                         ProjFileCheckResult checkRes = new ProjBuilder(new ProjFile(new FileInfo(args[1]))).ProjFile.FileCheck();
-                        foreach (var err in checkRes.ResultErrors)
-                        {
-                            Console.WriteLine($"{err.ErrorText} | Type => {err.ErrorType} | Is Critical => {err.IsCritical}\n");
-                        }
+                        Utils.PrintErrors(checkRes);
                     }
                     catch (Exception)
                     {

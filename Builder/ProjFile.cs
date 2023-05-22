@@ -145,7 +145,8 @@ namespace CopperGameTools.Builder
                 lineNumber++;
             }
 
-            return errors.Count > 0 ? new ProjFileCheckResult(CGTProjFileCheckResultType.Errors, errors) : new ProjFileCheckResult(CGTProjFileCheckResultType.NoErrors, new List<ProjFileCheckError>());
+            return errors.Count > 0 ? new ProjFileCheckResult(CGTProjFileCheckResultType.Errors, errors) 
+                : new ProjFileCheckResult(CGTProjFileCheckResultType.NoErrors, new List<ProjFileCheckError>());
         }
 
         private bool IsCritic(string line, string[] criticalKeys)
