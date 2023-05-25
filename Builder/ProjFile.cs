@@ -84,16 +84,6 @@ namespace CopperGameTools.Builder
             return "";
         }
 
-        public void PrintErros()
-        {
-            foreach (var err in FileCheck().ResultErrors)
-            {
-                Console.WriteLine(
-                    $"{err.ErrorText} | ErrorType -> {err.ErrorType} | Is Critical -> {err.IsCritical}"
-                );
-            }
-        }
-
         /// <summary>
         /// Initiates a Check of the Projectfile.
         /// </summary>
