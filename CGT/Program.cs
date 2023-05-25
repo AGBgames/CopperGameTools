@@ -10,8 +10,7 @@ namespace CopperGameTools.CLI
             // No subcommand used / no args?
             if (args.Length == 0)
             {
-                Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} \n" +
-                    $"Copyright: {Utils.GetCopyright()}\n" +
+                Console.WriteLine("CopperGameTools v0.4.1 \n" +
                     "No subcommand used.\n");
                 return;
             }
