@@ -36,12 +36,9 @@ namespace CopperGameTools.Builder
             if (sourceDir == null || outDir == null)
                 return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
 
-            // Collect building arguements
-            Console.WriteLine("STEP 1: Collection args...");
-            string[] argsList = ProjFile.KeyGet("project.src.args").Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            Console.WriteLine("Done!\n");
+            // Step 1: Packing Code Files
 
-            Console.WriteLine($"STEP 2: Packing JavaScript Code into {sourceOut}.js...");
+            Console.WriteLine($"STEP 1: Packing JavaScript Code into {sourceOut}.js...");
 
             string toWrite = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
 
@@ -75,16 +72,19 @@ namespace CopperGameTools.Builder
             File.WriteAllText(outDir + sourceOut + ".js", toWrite);
             Console.WriteLine("Done!\n");
 
-            Console.WriteLine("STEP 3: Checking for external resources folder...");
+            // Step 2: External resources
+
+            Console.WriteLine("STEP 2: Process External Resources:");
             string folder = ProjFile.KeyGet("project.externalres.dir");
-            if (folder != "")
+            if (folder != "" && Directory.Exists(folder))
             {
                 if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                 ContentPacker.ContentPacker.Pack(Path.GetFullPath(folder), projectName.ToLower(), ProjFile.KeyGet("project.externalres.out"));
                 Console.WriteLine("Done!\n");
             }
-            Console.WriteLine("Done with build.\n");
-            return check.ResultErrors.Count > 0 ? new ProjBuilderResult(ProjBuilderResultType.DoneWithErrors) :
+            Console.WriteLine($"Packed Source: {sourceOut + ".js"}\n" +
+                              $"Number of Errors: {check.ResultErrors.Count()}");
+            return check.ResultErrors.Count() > 0 ? new ProjBuilderResult(ProjBuilderResultType.DoneWithErrors) :
                 new ProjBuilderResult(ProjBuilderResultType.DoneNoErrors);
         }
     }
