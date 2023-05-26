@@ -57,8 +57,9 @@ namespace CopperGameTools.Builder
             foreach (var file in listedSourceFiles)
             {
                 if (file == mainFile) continue;
-                //FileInfo info = new(file);
-                toWrite += $"//Source File: {new FileInfo(file).Name}\n{File.ReadAllText(file)}\n";
+                FileInfo info = new(file);
+                toWrite += $"// -- {info.Name.ToUpper()} -- //" +
+                    $"\n{File.ReadAllText(file)}\n";
             }
 
             // write main file
@@ -67,8 +68,10 @@ namespace CopperGameTools.Builder
             // add main call with args
             toWrite += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
 
-            if (!Directory.Exists(outDir))
-                Directory.CreateDirectory(outDir);
+            toWrite = toWrite.Replace("\n\n", "\n");
+
+            // create .js file with all the code
+            if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
             File.WriteAllText(outDir + sourceOut + ".js", toWrite);
             Console.WriteLine("Done!\n");
 

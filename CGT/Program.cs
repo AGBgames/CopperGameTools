@@ -20,7 +20,7 @@ namespace CopperGameTools.CLI
                 case "build":
                     if (args.Length < 2)
                     {
-                        Console.WriteLine("build <pkf-file>");
+                        Console.WriteLine("build <project file>");
                         return;
                     }
                     try
@@ -50,6 +50,7 @@ namespace CopperGameTools.CLI
                         Console.WriteLine("Failed to load file!");
                     }
                     break;
+
                 case "check":
                     if (args.Length < 2)
                     {
