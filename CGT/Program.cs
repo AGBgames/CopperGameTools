@@ -10,7 +10,7 @@ namespace CopperGameTools.CLI
             // No subcommand used / no args?
             if (args.Length == 0)
             {
-                Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} \n" +
+                Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} on {Utils.GetBuildDate()}\n" +
                     "No subcommand used.\n");
                 return;
             }
