@@ -1,5 +1,6 @@
 using CopperGameTools.Builder;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace CopperGameTools.CLI
 {
@@ -17,6 +18,53 @@ namespace CopperGameTools.CLI
 
             switch (args[0])
             {
+                case "build+":
+                    if (args.Length < 2)
+                    {
+                        Console.WriteLine("build <project file>");
+                        return;
+                    }
+                    try
+                    {
+                        ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
+                        ProjFileCheckResult projFileCheckResult = builder.ProjFile.FileCheck();
+                        switch (builder.Build().ResultType)
+                        {
+                            case ProjBuilderResultType.DoneNoErrors:
+                                Console.WriteLine("No errors found.");
+                                break;
+                            case ProjBuilderResultType.DoneWithErrors:
+                                Console.WriteLine("Errors found.");
+                                Utils.PrintErrors(projFileCheckResult);
+                                break;
+                            case ProjBuilderResultType.FailedNoErrors:
+                                Console.WriteLine("Failed with no errors.");
+                                break;
+                            case ProjBuilderResultType.FailedWithErrors:
+                                Console.WriteLine("Failed with errors");
+                                Utils.PrintErrors(projFileCheckResult);
+                                break;
+                        }
+
+                        string projectFileName = builder.ProjFile.KeyGet("project.file");
+                        string projectPlatform = builder.ProjFile.KeyGet("project.platform");
+
+                        Console.WriteLine("Creating Game Executable from Project " + projectFileName + " for " + projectPlatform);
+
+                        Process editor = new Process();
+
+                        editor.StartInfo.FileName = "coppercube.exe";
+                        editor.StartInfo.Arguments = $"{new FileInfo(projectFileName).FullName} -publish:{projectPlatform} -quit";
+                        editor.StartInfo.CreateNoWindow = false;
+
+                        editor.Start();
+                        editor.WaitForExit();
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Failed to load file!");
+                    }
+                    break;
                 case "build":
                     if (args.Length < 2)
                     {
