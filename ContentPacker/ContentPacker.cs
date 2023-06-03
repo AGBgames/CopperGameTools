@@ -20,7 +20,7 @@ namespace CopperGameTools.ContentPacker
 
             string[] contentFiles = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
 
-            string[] supportedFileFormats = { "txt", "png", "bmp", "pck" };
+            string[] supportedFileFormats = { "txt", "png", "bmp", "jgp", "wav", "ogg" };
 
             ZipArchive zip = ZipFile.Open(outDir + name + ".cgc", ZipArchiveMode.Create);
             foreach (var contentFile in contentFiles)
@@ -64,7 +64,8 @@ namespace CopperGameTools.ContentPacker
         public static void Clean()
         {
             Console.WriteLine("Cleaning up content-directory...");
-            if (Directory.Exists("Data")) { Directory.Delete("Data", true); }
+            if (Directory.Exists("Data")) 
+                Directory.Delete("Data", true);
             Console.WriteLine("Done!");
         }
     }

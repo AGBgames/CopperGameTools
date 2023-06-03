@@ -7,8 +7,8 @@ class EntryPoint {
         if (args.Length == 0) return;
 
         // Unpack content
-        ContentPacker.ContentPacker.Unpack(args[1]);
         Console.WriteLine($"Unpacking content from {args[1]}...");
+        ContentPacker.ContentPacker.Unpack(args[1]);
 
         Console.WriteLine($"Launching {args[0]}...");
         // handle game process

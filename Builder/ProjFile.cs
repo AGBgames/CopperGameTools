@@ -4,7 +4,6 @@ namespace CopperGameTools.Builder
     {
         public FileInfo SourceFile { get; }
         public List<ProjFileKey> FileKeys { get; set; }
-        public string[] CriticalKeys { get; set; }
 
         public ProjFile(FileInfo sourceFile)
         {
@@ -12,45 +11,44 @@ namespace CopperGameTools.Builder
             {
                 SourceFile = new FileInfo("");
                 FileKeys = new List<ProjFileKey>();
-                CriticalKeys = new[] {""};
-                Console.WriteLine("Failed to load file: File not found!");
                 return;
             }
 
             SourceFile = sourceFile;
             FileKeys = new List<ProjFileKey>();
 
-            // Add all keys that should cause an critical error (when not used properly)
-            CriticalKeys = new[]
-            {
-            "project.name",
-            "project.src.dir",
-            "project.src.out",
-            "project.out.dir",
-            "project.src.main",
-            "project.src.args",
-            "project.externalres.dir",
-            "project.externalres.out"
-            };
-
-            AddKeys();
+            LoadKeysFromFile();
         }
 
-        public void ReloadKeys()
+        public void RefreshKeysFromFile()
         {
             try
             {
                 FileKeys.Clear();
-                FileKeys = new List<ProjFileKey>();
-                AddKeys();
+                LoadKeysFromFile();
             }
             catch (Exception)
             {
-                Console.WriteLine("Error while loading keys!");
+                Console.WriteLine("Error while reloading keys!");
             }
         }
 
-        public string KeyGet(string searchKey)
+        /// <summary>
+        /// Rescans the Projectfile and Reads all valid Keys.
+        /// </summary>
+        private void LoadKeysFromFile()
+        {
+            var lineNumber = 1;
+            foreach (var line in File.ReadAllLines(SourceFile.FullName))
+            {
+                if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
+                string[] split = line.Split("=");
+                FileKeys.Add(new ProjFileKey(split[0], split[1], lineNumber));
+                lineNumber++;
+            }
+        }
+
+        public string GetKey(string searchKey)
         {
             if (searchKey == null) return "";
             foreach (var key in FileKeys)
@@ -61,8 +59,8 @@ namespace CopperGameTools.Builder
                     var split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < split.Length; i++)
                     {
-                        if (string.IsNullOrEmpty(KeyGet(split[i]))) continue;
-                        key.Value = key.Value.Replace($"${split[i]}$", KeyGet(split[i]));
+                        if (string.IsNullOrEmpty(GetKey(split[i]))) continue;
+                        key.Value = key.Value.Replace($"${split[i]}$", GetKey(split[i]));
                     }
                 }
                 return key.Value;
@@ -75,7 +73,7 @@ namespace CopperGameTools.Builder
         /// </summary>
         /// <param name="line">Line to Get The Key From.</param>
         /// <returns></returns>
-        public string KeyGet(int line)
+        public string GetKey(int line)
         {
             foreach (var key in FileKeys)
             {
@@ -87,9 +85,9 @@ namespace CopperGameTools.Builder
         /// <summary>
         /// Initiates a Check of the Projectfile.
         /// </summary>
-        /// <returns>A ProjFileCheckResult. Result varies in case of errors.</returns>
+        /// <returns>A ProjFileCheckResult. You can take a look at the ProjFileCheckResult class to get an idea.</returns>
         /// <see cref="ProjBuilderResultType"/>
-        public ProjFileCheckResult FileCheck()
+        public ProjFileCheckResult CheckProjectFile()
         {
             var errors = new List<ProjFileCheckError>();
             var lineNumber = 1;
@@ -105,27 +103,30 @@ namespace CopperGameTools.Builder
 
                 if (!line.Contains('='))
                 {
-                    errors.Add(new ProjFileCheckError(ProjFileCheckErrorType.InvalidKey, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
+                    errors.Add(new ProjFileCheckError(ProjFileCheckErrorType.InvalidKey, $"[{lineNumber}] {line}"));
                     lineNumber++;
                     continue;
                 }
 
                 if (line.Split('=')[1] == "")
                 {
-                    errors.Add(new ProjFileCheckError(ProjFileCheckErrorType.InvalidValue, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
+                    errors.Add(new ProjFileCheckError(ProjFileCheckErrorType.InvalidValue, $"[{lineNumber}] {line}"));
                     lineNumber++;
                     continue;
                 }
 
-                var keyToAdd = new ProjFileKey(line.Split('=')[0],
-                    line.Split('=')[1],
+                string[] keySplit = line.Split('=');
+                var keyToAdd = new ProjFileKey(
+                    keySplit[0],
+                    keySplit[1],
                     lineNumber);
 
                 foreach (var key in readKeys)
                 {
                     if (key.Key == keyToAdd.Key)
                     {
-                        errors.Add(new ProjFileCheckError(ProjFileCheckErrorType.DuplicatedKey, IsCritic(line, CriticalKeys), $"[{lineNumber}] {line}"));
+                        errors.Add(
+                            new ProjFileCheckError(ProjFileCheckErrorType.DuplicatedKey, $"[{lineNumber}] {line}"));
                         lineNumber++;
                         continue;
                     }
@@ -139,33 +140,20 @@ namespace CopperGameTools.Builder
                 : new ProjFileCheckResult(CGTProjFileCheckResultType.NoErrors, new List<ProjFileCheckError>());
         }
 
-        private bool IsCritic(string line, string[] criticalKeys)
-        {
-            var isCritic = false;
-            if (criticalKeys.Contains(line.Replace("=", "")))
-            {
-                foreach (var criticKey in criticalKeys)
-                {
-                    if (line.StartsWith(criticKey)) isCritic = true;
-                }
-            }
+        // private static bool IsKeyCritical(string line, string[] criticalKeys)
+        // {
+        //     bool isCritic = false;
+        //     if (criticalKeys.Contains(line.Replace("=", "")))
+        //     {
+        //         foreach (var criticKey in criticalKeys)
+        //         {
+        //             if (line.StartsWith(criticKey)) 
+        //                 isCritic = true;
+        //         }
+        //     }
 
-            return isCritic;
-        }
-
-        /// <summary>
-        /// Rescans the Projectfile and Reads all valid Keys.
-        /// </summary>
-        private void AddKeys()
-        {
-            var lineNumber = 1;
-            foreach (var line in File.ReadAllLines(SourceFile.FullName))
-            {
-                if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
-                FileKeys.Add(new ProjFileKey(line.Split('=')[0], line.Split('=')[1], lineNumber));
-                lineNumber++;
-            }
-        }
+        //     return isCritic;
+        // }
     }
 
     #region File Check
@@ -202,15 +190,13 @@ namespace CopperGameTools.Builder
     /// <see cref="ProjFileCheckErrorType"/>
     public class ProjFileCheckError
     {
-        public ProjFileCheckError(ProjFileCheckErrorType errorType, bool isCritical, string errorText)
+        public ProjFileCheckError(ProjFileCheckErrorType errorType, string errorText)
         {
             ErrorType = errorType;
-            IsCritical = isCritical;
             ErrorText = errorText;
         }
 
         public ProjFileCheckErrorType ErrorType { get; }
-        public bool IsCritical { get; }
         public string ErrorText { get; }
     }
 

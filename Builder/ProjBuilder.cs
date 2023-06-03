@@ -1,5 +1,3 @@
-using CopperGameTools.Builder;
-
 namespace CopperGameTools.Builder
 {
     public class ProjBuilder
@@ -14,7 +12,7 @@ namespace CopperGameTools.Builder
         /// <summary>
         /// Builds the Project defined by the .PKF Projectfile.
         /// </summary>
-        /// <returns>Returns a ProjBuilderResult. The result may vary in case of errors.</returns>
+        /// <returns>Returns a ProjBuilderResult.</returns>
         public ProjBuilderResult Build()
         {
             Console.WriteLine($"Building with CopperGameTools v{Utils.GetVersion()}:");
@@ -22,30 +20,44 @@ namespace CopperGameTools.Builder
             if (ProjFile == null || ProjFile.SourceFile.DirectoryName == null)
                 return new ProjBuilderResult(ProjBuilderResultType.FailedNoErrors);
 
-            ProjFileCheckResult check = ProjFile.FileCheck();
-            foreach (var error in check.ResultErrors)
-                if (error.IsCritical) // exit with errors when a critical error is found
-                    return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
+            ProjFileCheckResult check = ProjFile.CheckProjectFile();
+            if (check.ResultErrors.Count() > 0)
+            {
+                System.Console.WriteLine($"{check.ResultErrors.Count()} Error(s) have been found! Aborting...\n");
+                return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
+            }
+                
 
-            string projectName = ProjFile.KeyGet("project.name");
-            string sourceDir = Path.Combine(ProjFile.SourceFile.DirectoryName, ProjFile.KeyGet("project.src.dir"));
-            string sourceOut = ProjFile.KeyGet("project.src.out");
-            string outDir = Path.Combine(ProjFile.SourceFile.DirectoryName, ProjFile.KeyGet("project.out.dir"));
-            string mainFile = sourceDir + ProjFile.KeyGet("project.src.main");
+            string projectName = ProjFile.GetKey("project.name");
+            if (projectName == "")
+                return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
 
-            if (sourceDir == null || outDir == null)
+            string sourceDir = Path.Combine(ProjFile.SourceFile.DirectoryName, ProjFile.GetKey("project.src.dir"));
+            if (sourceDir == null || !Directory.Exists(sourceDir))
+                return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
+
+            string sourceOut = ProjFile.GetKey("project.src.out");
+            if (sourceOut == "")
+                return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
+
+            string outDir = Path.Combine(ProjFile.SourceFile.DirectoryName, ProjFile.GetKey("project.out.dir"));
+            if (outDir == null || !Directory.Exists(outDir))
+                return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
+
+            string mainFileName = ProjFile.GetKey("project.src.main");
+            if (mainFileName == "" || !File.Exists(sourceDir + mainFileName))
                 return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
 
             // Step 1: Packing Code Files
 
             Console.WriteLine($"STEP 1: Packing JavaScript Code into {sourceOut}.js...");
 
-            string toWrite = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
+            string toWriteInPackedFile = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
 
             // write keys from pkf file
             foreach (ProjFileKey key in ProjFile.FileKeys)
             {
-                toWrite += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
+                toWriteInPackedFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
             }
 
             List<string> listedSourceFiles = (Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)).ToList();
@@ -53,39 +65,46 @@ namespace CopperGameTools.Builder
             // write source files (except main)
             foreach (var file in listedSourceFiles)
             {
-                if (file == mainFile) continue;
+                if (file == sourceDir + mainFileName) 
+                    continue;
                 FileInfo info = new(file);
-                toWrite += $"// -- {info.Name.ToUpper()} -- //" +
+                toWriteInPackedFile += $"// -- {info.Name.ToUpper()} -- //" +
                     $"\n{File.ReadAllText(file)}\n";
             }
 
             // write main file
-            toWrite += File.ReadAllText(mainFile);
+            toWriteInPackedFile += File.ReadAllText(sourceDir + mainFileName);
 
             // add main call with args
-            toWrite += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
+            toWriteInPackedFile += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
 
-            toWrite = toWrite.Replace("\n\n", "\n");
+            toWriteInPackedFile = toWriteInPackedFile.Replace("\n\n", "\n");
 
             // create .js file with all the code
-            if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
-            File.WriteAllText(outDir + sourceOut + ".js", toWrite);
+            try
+            {
+                File.WriteAllText(outDir + sourceOut + ".js", toWriteInPackedFile);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Failed to write file!");
+                return new ProjBuilderResult(ProjBuilderResultType.FailedNoErrors);
+            }
             Console.WriteLine("Done!\n");
 
             // Step 2: External resources
 
             Console.WriteLine("STEP 2: Process External Resources:");
-            string folder = ProjFile.KeyGet("project.externalres.dir");
+            string folder = ProjFile.GetKey("project.externalres.dir");
             if (folder != "" && Directory.Exists(folder))
             {
                 if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                ContentPacker.ContentPacker.Pack(Path.GetFullPath(folder), projectName.ToLower(), ProjFile.KeyGet("project.externalres.out"));
+                ContentPacker.ContentPacker.Pack(Path.GetFullPath(folder), projectName.ToLower(), ProjFile.GetKey("project.externalres.out"));
                 Console.WriteLine("Done!\n");
             }
-            Console.WriteLine($"Packed Source: {sourceOut + ".js"}\n" +
-                              $"Number of Errors: {check.ResultErrors.Count()}");
-            return check.ResultErrors.Count() > 0 ? new ProjBuilderResult(ProjBuilderResultType.DoneWithErrors) :
-                new ProjBuilderResult(ProjBuilderResultType.DoneNoErrors);
+            Console.WriteLine($"Packed Source: {sourceOut + ".js"}\n");
+
+            return new ProjBuilderResult(ProjBuilderResultType.DoneNoErrors);
         }
     }
 
@@ -108,7 +127,6 @@ namespace CopperGameTools.Builder
     public enum ProjBuilderResultType
     {
         DoneNoErrors,
-        DoneWithErrors,
         FailedNoErrors,
         FailedWithErrors
     }
