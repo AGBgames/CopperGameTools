@@ -16,6 +16,8 @@ namespace CopperGameTools.Builder
         public ProjBuilderResult Build()
         {
             Console.WriteLine($"Building with CopperGameTools v{Utils.GetVersion()}:");
+            Console.WriteLine("Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
+                "At the time of this build, version 6.6 is the newest one available.");
 
             if (ProjFile == null || ProjFile.SourceFile.DirectoryName == null)
                 return new ProjBuilderResult(ProjBuilderResultType.FailedNoErrors);
@@ -52,6 +54,7 @@ namespace CopperGameTools.Builder
             Console.WriteLine($"STEP 1: Packing JavaScript Code into {sourceOut}.js...");
 
             string toPutInOutputFile = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
+            toPutInOutputFile += "//Please keep CGT updated so functionality with newer versions of CopperCube is ensured. //\n";
 
             // write keys from pkf file
             foreach (ProjFileKey key in ProjFile.FileKeys)
