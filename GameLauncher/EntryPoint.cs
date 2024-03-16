@@ -25,7 +25,7 @@ class EntryPoint {
 
         // loop while the game is running
         while (!gameProcess.HasExited) {
-            Thread.Sleep(800);
+            Thread.Sleep(1800);
         }
 
         ContentPacker.ContentPacker.Clean();

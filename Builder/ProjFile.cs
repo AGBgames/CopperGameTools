@@ -60,7 +60,7 @@ namespace CopperGameTools.Builder
                     for (int i = 0; i < split.Length; i++)
                     {
                         if (string.IsNullOrEmpty(GetKey(split[i]))) continue;
-                        key.Value = key.Value.Replace($"${split[i]}$", GetKey(split[i]));
+                        key.Value.Replace($"${split[i]}$", GetKey(split[i]));
                     }
                 }
                 return key.Value;

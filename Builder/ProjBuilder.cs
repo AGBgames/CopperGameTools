@@ -21,12 +21,11 @@ namespace CopperGameTools.Builder
                 return new ProjBuilderResult(ProjBuilderResultType.FailedNoErrors);
 
             ProjFileCheckResult check = ProjFile.CheckProjectFile();
-            if (check.ResultErrors.Count() > 0)
+            if (check.ResultErrors.Count > 0)
             {
-                System.Console.WriteLine($"{check.ResultErrors.Count()} Error(s) have been found! Aborting...\n");
+                Console.WriteLine($"{check.ResultErrors.Count} Error(s) have been found! Aborting...\n");
                 return new ProjBuilderResult(ProjBuilderResultType.FailedWithErrors);
             }
-                
 
             string projectName = ProjFile.GetKey("project.name");
             if (projectName == "")
@@ -52,12 +51,12 @@ namespace CopperGameTools.Builder
 
             Console.WriteLine($"STEP 1: Packing JavaScript Code into {sourceOut}.js...");
 
-            string toWriteInPackedFile = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
+            string toPutInOutputFile = $"// Generated using CopperGameTools v{Utils.GetVersion()} //\n";
 
             // write keys from pkf file
             foreach (ProjFileKey key in ProjFile.FileKeys)
             {
-                toWriteInPackedFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
+                toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
             }
 
             List<string> listedSourceFiles = (Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)).ToList();
@@ -68,22 +67,22 @@ namespace CopperGameTools.Builder
                 if (file == sourceDir + mainFileName) 
                     continue;
                 FileInfo info = new(file);
-                toWriteInPackedFile += $"// -- {info.Name.ToUpper()} -- //" +
+                toPutInOutputFile += $"// -- {info.Name.ToUpper()} -- //" +
                     $"\n{File.ReadAllText(file)}\n";
             }
 
             // write main file
-            toWriteInPackedFile += File.ReadAllText(sourceDir + mainFileName);
+            toPutInOutputFile += File.ReadAllText(sourceDir + mainFileName);
 
             // add main call with args
-            toWriteInPackedFile += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
+            toPutInOutputFile += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
 
-            toWriteInPackedFile = toWriteInPackedFile.Replace("\n\n", "\n");
+            toPutInOutputFile = toPutInOutputFile.Replace("\n\n", "\n");
 
             // create .js file with all the code
             try
             {
-                File.WriteAllText(outDir + sourceOut + ".js", toWriteInPackedFile);
+                File.WriteAllText(outDir + sourceOut + ".js", toPutInOutputFile);
             }
             catch (Exception)
             {

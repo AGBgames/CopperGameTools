@@ -12,6 +12,7 @@ namespace CopperGameTools.CLI
             {
                 Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} on {Utils.GetBuildDate()}\n" +
                     "No subcommand used.\n");
+                Console.ReadKey();
                 return;
             }
 
