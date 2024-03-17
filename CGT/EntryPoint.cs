@@ -7,8 +7,11 @@ namespace CopperGameTools.CLI
     {
         public static void Main(String[] args)
         {
+            Console.WriteLine("Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
+                "At the time of this build, version 6.6 is the newest one available.");
+
             // No subcommand used / no args?
-            if (args.Length == 0)
+            if (Utils.IsEmpty(args))
             {
                 Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} on {Utils.GetBuildDate()}\n" +
                     "No subcommand used.\n");

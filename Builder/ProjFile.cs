@@ -162,16 +162,11 @@ namespace CopperGameTools.Builder
     /// Class-Wrapper for ProjFileCheckResult
     /// </summary>
     /// <seealso cref="ProjFileCheckError"/>
-    public class ProjFileCheckResult
+    public class ProjFileCheckResult(CGTProjFileCheckResultType resultType, List<ProjFileCheckError> resultErrors)
     {
-        public ProjFileCheckResult(CGTProjFileCheckResultType resultType, List<ProjFileCheckError> resultErrors)
-        {
-            ResultType = resultType;
-            ResultErrors = resultErrors;
-        }
-
-        public CGTProjFileCheckResultType ResultType { get; }
-        public List<ProjFileCheckError> ResultErrors { get; }
+        public CGTProjFileCheckResultType ResultType { get; } = resultType;
+        public List<ProjFileCheckError> ResultErrors { get; } = resultErrors;
+        public bool FoundErrors => ResultErrors.Count > 0 ? true : false;
     }
 
     public enum CGTProjFileCheckResultType

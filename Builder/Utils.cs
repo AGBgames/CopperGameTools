@@ -1,6 +1,6 @@
 ﻿namespace CopperGameTools.Builder
 {
-    public class Utils
+    public static class Utils
     {
         public static string GetVersion() { return "0.4.5"; }
         public static string GetBuildDate() { return "16.03.24 [DD.MM.YY]"; }
@@ -13,6 +13,11 @@
             {
                 Console.WriteLine($"{err.ErrorText} | Error Type: {err.ErrorType}");
             }
+        }
+
+        public static bool IsEmpty(Array array)
+        {
+            return array.Length == 0;
         }
     }
 }
