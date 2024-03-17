@@ -1,8 +1,8 @@
 namespace CopperGameTools.Builder
 {
-    public class ProjBuilder(ProjFile cgtProjFile)
+    public class ProjectBuilder(ProjectFile cgtProjFile)
     {
-        public ProjFile ProjFile { get; } = cgtProjFile;
+        public ProjectFile ProjFile { get; } = cgtProjFile;
         
         /// <summary>
         /// Builds the Project defined by the .PKF Projectfile.
@@ -50,7 +50,7 @@ namespace CopperGameTools.Builder
             toPutInOutputFile += "//Please keep CGT updated so functionality with newer versions of CopperCube is ensured. //\n";
 
             // add all keys in the pkf as coppercube variables to use during runtime.
-            foreach (ProjFileKey key in ProjFile.FileKeys)
+            foreach (ProjectFileKey key in ProjFile.FileKeys)
             {
                 toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
             }

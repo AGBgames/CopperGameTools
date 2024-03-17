@@ -32,7 +32,7 @@ namespace CopperGameTools.CLI
                         if (!Directory.Exists("Publish"))
                             Directory.CreateDirectory("./Publish");
 
-                        ProjFile projFile = new ProjFile(new FileInfo(args[1]));
+                        ProjectFile projFile = new ProjectFile(new FileInfo(args[1]));
 
                         string platform = projFile.GetKey("project.platform");
                         if (platform == "")
@@ -76,7 +76,7 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
+                        ProjectBuilder builder = new ProjectBuilder(new ProjectFile(new FileInfo(args[1])));
                         ProjFileCheckResult projFileCheckResult = builder.ProjFile.CheckProjectFile();
                         switch (builder.Build().ResultType)
                         {
@@ -130,7 +130,7 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjBuilder builder = new ProjBuilder(new ProjFile(new FileInfo(args[1])));
+                        ProjectBuilder builder = new ProjectBuilder(new ProjectFile(new FileInfo(args[1])));
                         ProjFileCheckResult projFileCheckResult = builder.ProjFile.CheckProjectFile();
                         switch (builder.Build().ResultType)
                         {
@@ -160,7 +160,7 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjFileCheckResult checkRes = new ProjBuilder(new ProjFile(new FileInfo(args[1]))).ProjFile.CheckProjectFile();
+                        ProjFileCheckResult checkRes = new ProjectBuilder(new ProjectFile(new FileInfo(args[1]))).ProjFile.CheckProjectFile();
                         Utils.PrintErrors(checkRes);
                     }
                     catch (Exception)

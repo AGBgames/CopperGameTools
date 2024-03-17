@@ -1,21 +1,21 @@
 namespace CopperGameTools.Builder
 {
-    public class ProjFile
+    public class ProjectFile
     {
         public FileInfo SourceFile { get; }
-        public List<ProjFileKey> FileKeys { get; set; }
+        public List<ProjectFileKey> FileKeys { get; set; }
 
-        public ProjFile(FileInfo sourceFile)
+        public ProjectFile(FileInfo sourceFile)
         {
             if (!sourceFile.Exists || sourceFile == null)
             {
                 SourceFile = new FileInfo("");
-                FileKeys = new List<ProjFileKey>();
+                FileKeys = new List<ProjectFileKey>();
                 return;
             }
 
             SourceFile = sourceFile;
-            FileKeys = new List<ProjFileKey>();
+            FileKeys = new List<ProjectFileKey>();
 
             LoadKeysFromFile();
         }
@@ -43,7 +43,7 @@ namespace CopperGameTools.Builder
             {
                 if (!line.Contains("=") || line.StartsWith("#") || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
                 string[] split = line.Split("=");
-                FileKeys.Add(new ProjFileKey(split[0], split[1], lineNumber));
+                FileKeys.Add(new ProjectFileKey(split[0], split[1], lineNumber));
                 lineNumber++;
             }
         }
@@ -92,7 +92,7 @@ namespace CopperGameTools.Builder
             var errors = new List<ProjFileCheckError>();
             var lineNumber = 1;
 
-            var readKeys = new List<ProjFileKey>();
+            var readKeys = new List<ProjectFileKey>();
             foreach (var line in File.ReadAllLines(SourceFile.FullName))
             {
                 if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
@@ -116,7 +116,7 @@ namespace CopperGameTools.Builder
                 }
 
                 string[] keySplit = line.Split('=');
-                var keyToAdd = new ProjFileKey(
+                var keyToAdd = new ProjectFileKey(
                     keySplit[0],
                     keySplit[1],
                     lineNumber);

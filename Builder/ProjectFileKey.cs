@@ -1,6 +1,6 @@
 namespace CopperGameTools.Builder
 {
-    public struct ProjFileKey(string key, string value, int line)
+    public struct ProjectFileKey(string key, string value, int line)
     {
         public string Key { get; } = key;
         public string Value { get; set; } = value;
