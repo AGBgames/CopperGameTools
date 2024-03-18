@@ -86,7 +86,7 @@ namespace CopperGameTools.Builder
         /// Initiates a Check of the Projectfile.
         /// </summary>
         /// <returns>A ProjFileCheckResult. You can take a look at the ProjFileCheckResult class to get an idea.</returns>
-        /// <see cref="ProjBuilderResultType"/>
+        /// <see cref="ProjectBuilderResultType"/>
         public ProjFileCheckResult CheckProjectFile()
         {
             var errors = new List<ProjFileCheckError>();

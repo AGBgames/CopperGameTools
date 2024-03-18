@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ContentPacker\ContentPacker.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

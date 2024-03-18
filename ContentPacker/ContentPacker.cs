@@ -42,9 +42,9 @@ namespace CopperGameTools.ContentPacker
         /// <summary>
         /// Unpacks the packed files into the Data folder.
         /// </summary>
-        public static void Unpack(string contentFile)
+        public static void Unpack(string contentFile, string unpackFolder = "Data")
         {
-            if (!Directory.Exists("Data")) { Directory.CreateDirectory("Data"); }
+            if (!Directory.Exists(unpackFolder)) { Directory.CreateDirectory(unpackFolder); }
 
             if (!File.Exists(contentFile))
             {
@@ -54,7 +54,7 @@ namespace CopperGameTools.ContentPacker
 
             ZipArchive zip = ZipFile.Open(contentFile + ".cgc", ZipArchiveMode.Read);
             Console.WriteLine("Unpacking content to directory...");
-            zip.ExtractToDirectory("Data");
+            zip.ExtractToDirectory(unpackFolder);
             Console.WriteLine("Done!");
         }
 

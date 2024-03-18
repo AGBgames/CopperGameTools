@@ -6,14 +6,17 @@ class EntryPoint {
     public static void Main(String[] args) {
         if (args.Length == 0) return;
 
-        // Unpack content
-        Console.WriteLine($"Unpacking content from {args[1]}...");
-        ContentPacker.ContentPacker.Unpack(args[1]);
+        string gameName = args[0];
+        string packFile = args[1];
 
-        Console.WriteLine($"Launching {args[0]}...");
+        // Unpack content
+        Console.WriteLine($"Unpacking content from {packFile}...");
+        ContentPacker.ContentPacker.Unpack(packFile);
+
+        Console.WriteLine($"Launching {gameName}...");
         // handle game process
-        Process gameProcess = new Process();
-        gameProcess.StartInfo.FileName = args[0];
+        Process gameProcess = new();
+        gameProcess.StartInfo.FileName = gameName;
         gameProcess.StartInfo.UseShellExecute = false;
         gameProcess.StartInfo.RedirectStandardOutput = true;
 
@@ -26,6 +29,20 @@ class EntryPoint {
         // loop while the game is running
         while (!gameProcess.HasExited) {
             Thread.Sleep(1800);
+            string? command = Console.ReadLine();
+            if (command == null) continue;
+            var commandArgs = command.Split(" ");
+            if (command == "quit")
+            {
+                gameProcess.Kill();
+                break;
+            }
+            else if (command.StartsWith("export "))
+            {
+                if (commandArgs.Length < 2) continue;
+                ContentPacker.ContentPacker.Unpack(packFile, "Export");
+                Console.WriteLine("Exported Data to Export/");
+            }
         }
 
         ContentPacker.ContentPacker.Clean();

@@ -7,14 +7,15 @@ namespace CopperGameTools.CLI
     {
         public static void Main(String[] args)
         {
-            Console.WriteLine("Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
-                "At the time of this build, version 6.6 is the newest one available.");
+            Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
+                $"At the time of this build, version {Shared.Constants.SupportedCopperCubeVersion} is the latest supported one.");
 
             // No subcommand used / no args?
             if (Utils.IsEmpty(args))
             {
-                Console.WriteLine($"CopperGameTools v{Utils.GetVersion()} on {Utils.GetBuildDate()}\n" +
+                Console.WriteLine($"CopperGameTools v{Shared.Constants.Version} on {Shared.Constants.BuildDate}\n" +
                     "No subcommand used.\n");
+                Console.WriteLine("Press any key to exit.");
                 Console.ReadKey();
                 return;
             }
@@ -32,7 +33,7 @@ namespace CopperGameTools.CLI
                         if (!Directory.Exists("Publish"))
                             Directory.CreateDirectory("./Publish");
 
-                        ProjectFile projFile = new ProjectFile(new FileInfo(args[1]));
+                        ProjectFile projFile = new(new FileInfo(args[1]));
 
                         string platform = projFile.GetKey("project.platform");
                         if (platform == "")
@@ -76,30 +77,30 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjectBuilder builder = new ProjectBuilder(new ProjectFile(new FileInfo(args[1])));
-                        ProjFileCheckResult projFileCheckResult = builder.ProjFile.CheckProjectFile();
+                        ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
+                        ProjFileCheckResult check = builder.ProjectFile.CheckProjectFile();
                         switch (builder.Build().ResultType)
                         {
-                            case ProjBuilderResultType.DoneNoErrors:
+                            case ProjectBuilderResultType.DoneNoErrors:
                                 Console.WriteLine("Error: Not caused by project-file!");
                                 break;
-                            case ProjBuilderResultType.FailedNoErrors:
+                            case ProjectBuilderResultType.FailedNoErrors:
                                 Console.WriteLine("Failed: Not caused by project-file!");
                                 break;
-                            case ProjBuilderResultType.FailedWithErrors:
+                            case ProjectBuilderResultType.FailedWithErrors:
                                 Console.WriteLine("Failed: Caused by project-file!");
-                                Utils.PrintErrors(projFileCheckResult);
+                                Utils.PrintErrors(check);
                                 break;
                         }
 
-                        string projectFileName = builder.ProjFile.GetKey("project.file");
+                        string projectFileName = builder.ProjectFile.GetKey("project.file");
                         if (projectFileName == "" || !File.Exists(projectFileName))
                         {
                             Console.WriteLine("CopperCube-Project file not found!");
                             return;
                         }
 
-                        string projectPlatform = builder.ProjFile.GetKey("project.platform");
+                        string projectPlatform = builder.ProjectFile.GetKey("project.platform");
                         if (projectPlatform == "")
                         {
                             Console.WriteLine("No platform specified!");
@@ -108,7 +109,7 @@ namespace CopperGameTools.CLI
 
                         Console.WriteLine("Creating Game Executable from Project " + projectFileName + " for " + projectPlatform);
 
-                        Process editor = new Process();
+                        Process editor = new();
 
                         editor.StartInfo.FileName = "coppercube.exe";
                         editor.StartInfo.Arguments = $"{new FileInfo(projectFileName).FullName} -publish:{projectPlatform} -quit";
@@ -130,19 +131,19 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjectBuilder builder = new ProjectBuilder(new ProjectFile(new FileInfo(args[1])));
-                        ProjFileCheckResult projFileCheckResult = builder.ProjFile.CheckProjectFile();
+                        ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
+                        ProjFileCheckResult check = builder.ProjectFile.CheckProjectFile();
                         switch (builder.Build().ResultType)
                         {
-                            case ProjBuilderResultType.DoneNoErrors:
+                            case ProjectBuilderResultType.DoneNoErrors:
                                 Console.WriteLine("No errors found.");
                                 break;
-                            case ProjBuilderResultType.FailedNoErrors:
+                            case ProjectBuilderResultType.FailedNoErrors:
                                 Console.WriteLine("Failed with no errors.");
                                 break;
-                            case ProjBuilderResultType.FailedWithErrors:
+                            case ProjectBuilderResultType.FailedWithErrors:
                                 Console.WriteLine("Failed with errors");
-                                Utils.PrintErrors(projFileCheckResult);
+                                Utils.PrintErrors(check);
                                 break;
                         }
                     }
@@ -160,8 +161,8 @@ namespace CopperGameTools.CLI
                     }
                     try
                     {
-                        ProjFileCheckResult checkRes = new ProjectBuilder(new ProjectFile(new FileInfo(args[1]))).ProjFile.CheckProjectFile();
-                        Utils.PrintErrors(checkRes);
+                        ProjFileCheckResult check = new ProjectBuilder(new ProjectFile(new FileInfo(args[1]))).ProjectFile.CheckProjectFile();
+                        Utils.PrintErrors(check);
                     }
                     catch (Exception)
                     {
