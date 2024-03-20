@@ -2,38 +2,35 @@ using System.IO.Compression;
 
 namespace CopperGameTools.ContentPacker
 {
-    public class ContentPacker
+    public class Packer
     {
         /// <summary>
         /// Packs all the files from the project.externalres.dir-folder into a ZIP like file.
         /// </summary>
-        public static void Pack(string path, string name, string outDir)
+        public static void Pack(string contentSourcePath, string outputFileName, string outputDirectory)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            if (!Directory.Exists(outDir))
-                Directory.CreateDirectory(outDir);
+            string zipFileName = outputDirectory + outputFileName;
+
+            if (!Directory.Exists(contentSourcePath))
+            {
+                Directory.CreateDirectory(outputDirectory);
+                Console.WriteLine("Source directory for external resources not does not exist. \n" +
+                    "The folder was created, but no files will be added to the .cgc file.");
+                return;
+            }
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
 
             // delete old file
-            if (File.Exists(outDir + name + ".cgc"))
-                File.Delete(outDir + name + ".cgc");
+            if (File.Exists(zipFileName + ".cgc"))
+                File.Delete(zipFileName + ".cgc");
 
-            string[] contentFiles = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            string[] contentFiles = Directory.GetFiles(contentSourcePath, "*.*", SearchOption.AllDirectories);
 
-            string[] supportedFileFormats = { "txt", "png", "bmp", "jgp", "wav", "ogg" };
-
-            ZipArchive zip = ZipFile.Open(outDir + name + ".cgc", ZipArchiveMode.Create);
-            foreach (var contentFile in contentFiles)
+            ZipArchive zip = ZipFile.Open(zipFileName + ".cgc", ZipArchiveMode.Create);
+            foreach (string contentFile in contentFiles)
             {
-                string fileFormat = contentFile.Split(".")[contentFile.Split(".").Length - 1];
-
-                if (!supportedFileFormats.Contains(fileFormat))
-                {
-                    Console.WriteLine($"Fileformat of {contentFile} is not supported, skipping...");
-                    continue;
-                }
-
-                var nameOfCurrentFile = Path.GetFileName(contentFile);
+                string nameOfCurrentFile = Path.GetFileName(contentFile);
                 zip.CreateEntryFromFile(contentFile, nameOfCurrentFile);
                 Console.WriteLine("Written " + nameOfCurrentFile + " to cgc.");
             }
