@@ -1,4 +1,5 @@
 using CopperGameTools.Builder;
+using CopperGameTools.Shared;
 using System.Diagnostics;
 
 namespace CopperGameTools.CLI;
@@ -11,8 +12,8 @@ class Program
         if (Utils.ArrayIsEmpty(args))
         {
             Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
-            $"At the time of this build, version {Shared.Constants.SupportedCopperCubeVersion} is the latest supported one.");
-            Console.WriteLine($"CopperGameTools v{Shared.Constants.Version} on {Shared.Constants.BuildDate}\n" +
+            $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.");
+            Console.WriteLine($"CopperGameTools v{Constants.Version} on {Constants.BuildDate}\n" +
                 "No subcommand used.\n");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -78,16 +79,17 @@ class Program
                 {
                     ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
                     ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
-                    switch (builder.Build().ResultType)
+                    switch (builder.Build())
                     {
                         case ProjectBuilderResultType.DoneNoErrors:
-                            Console.WriteLine("Error: Not caused by project-file!");
-                            break;
-                        case ProjectBuilderResultType.FailedNoErrors:
-                            Console.WriteLine("Failed: Not caused by project-file!");
+                            Console.WriteLine("No errors found.");
                             break;
                         case ProjectBuilderResultType.FailedWithErrors:
-                            Console.WriteLine("Failed: Caused by project-file!");
+                            Console.WriteLine("Failed due to system errors!");
+                            Utils.PrintErrors(check);
+                            break;
+                        case ProjectBuilderResultType.FailedWithProjectFileErrors:
+                            Console.WriteLine("Failed due to project file errors!");
                             Utils.PrintErrors(check);
                             break;
                     }
@@ -132,16 +134,17 @@ class Program
                 {
                     ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
                     ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
-                    switch (builder.Build().ResultType)
+                    switch (builder.Build())
                     {
                         case ProjectBuilderResultType.DoneNoErrors:
                             Console.WriteLine("No errors found.");
                             break;
-                        case ProjectBuilderResultType.FailedNoErrors:
-                            Console.WriteLine("Failed with no errors.");
-                            break;
                         case ProjectBuilderResultType.FailedWithErrors:
-                            Console.WriteLine("Failed with errors");
+                            Console.WriteLine("Failed due to system errors!");
+                            Utils.PrintErrors(check);
+                            break;
+                        case ProjectBuilderResultType.FailedWithProjectFileErrors:
+                            Console.WriteLine("Failed due to project file errors!");
                             Utils.PrintErrors(check);
                             break;
                     }
@@ -160,7 +163,8 @@ class Program
                 }
                 try
                 {
-                    ProjectFileCheckResult check = new ProjectBuilder(new ProjectFile(new FileInfo(args[1]))).ProjectFile.CheckProjectFile();
+                    ProjectFileCheckResult check = 
+                        new ProjectFile(new FileInfo (args[1])).CheckProjectFile();
                     Utils.PrintErrors(check);
                 }
                 catch (Exception)

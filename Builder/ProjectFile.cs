@@ -10,12 +10,13 @@ public class ProjectFile
         if (!sourceFile.Exists || sourceFile == null)
         {
             SourceFile = new FileInfo("");
-            FileKeys = new List<ProjectFileKey>();
+            FileKeys = [];
+            Console.WriteLine($"The project file {sourceFile} does not exists / could not be found! Aborting.");
             return;
         }
 
         SourceFile = sourceFile;
-        FileKeys = new List<ProjectFileKey>();
+        FileKeys = [];
 
         LoadKeysFromFile();
     }
@@ -50,7 +51,7 @@ public class ProjectFile
 
     public string GetKey(string searchKey)
     {
-        if (searchKey == null) return "";
+        if (searchKey is null) return "";
         foreach (ProjectFileKey key in FileKeys)
         {
             if (key.Key != searchKey) continue;
@@ -66,6 +67,18 @@ public class ProjectFile
             return key.Value;
         }
         return "";
+    }
+
+    public int GetKeyAsInt(string searchKey)
+    {
+        string key = GetKey(searchKey);
+        return key == "" ? 0 : Convert.ToInt32(key);
+    }
+
+    public double GetKeyAsDouble(string searchKey)
+    {
+        string key = GetKey(searchKey);
+        return key == "" ? 0.0 : Convert.ToDouble(key);
     }
 
     /// <summary>
