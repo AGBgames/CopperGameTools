@@ -74,11 +74,17 @@ public class ProjectFile
         string key = GetKey(searchKey);
         return key == "" ? 0 : Convert.ToInt32(key);
     }
-
+    
     public double GetKeyAsDouble(string searchKey)
     {
         string key = GetKey(searchKey);
         return key == "" ? 0.0 : Convert.ToDouble(key);
+    }
+
+    public bool GetKeyAsBoolean(string searchKey)
+    {
+        string key = GetKey(searchKey);
+        return key != "" && Convert.ToBoolean(key);
     }
 
     /// <summary>
