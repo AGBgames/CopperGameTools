@@ -97,6 +97,18 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         // Step 2: External resources
 
         Console.WriteLine("STEP 2: Process External Resources:");
+        if (ProjectFile.GetKeyAsBoolean("project.externalres.enabled"))
+        {
+            PackExternalResources(projectName);
+        }
+
+        Console.WriteLine($"Done!");
+
+        return ProjectBuilderResultType.DoneNoErrors;
+    }
+
+    private void PackExternalResources(string projectName)
+    {
         string externalResourcesFolder = ProjectFile.GetKey("project.externalres.dir");
         if (externalResourcesFolder != "")
         {
@@ -108,10 +120,6 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         {
             Console.WriteLine("No External Resources Folder defined, no resources will be packed!");
         }
-
-        Console.WriteLine($"Done!");
-
-        return ProjectBuilderResultType.DoneNoErrors;
     }
 }
 
