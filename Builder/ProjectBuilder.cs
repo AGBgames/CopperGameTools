@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CopperGameTools.ContentPacker;
 using CopperGameTools.Shared;
 
@@ -23,6 +24,11 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         {
             Console.WriteLine($"{check.ResultErrors.Count} Error(s) have been found! Aborting...\n");
             return ProjectBuilderResultType.FailedWithProjectFileErrors;
+        }
+
+        if (ProjectFile.GetKey("builder.version") != Constants.Version)
+        {
+            Console.WriteLine("Project file set for different version of CopperCubeGameTools.\nSupport might be limited.");
         }
 
         string projectName = ProjectFile.GetKey("project.name");
@@ -92,7 +98,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             Console.WriteLine("Failed to write file!");
             return ProjectBuilderResultType.FailedWithErrors;
         }
-        Console.WriteLine($"Packed Source to {sourceOut + ".js"}");
+        Console.WriteLine($"Packed Source to {outDir + sourceOut + ".js"}\n");
 
         // Step 2: External resources
 
@@ -100,6 +106,13 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         if (ProjectFile.GetKeyAsBoolean("project.externalres.enabled"))
         {
             PackExternalResources(projectName);
+        }
+
+        // Step 3: Custom Post-Build Commands
+        System.Console.WriteLine("STEP 3: Custom Post-Build Commands:");
+        if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
+        {
+            PostBuildCommand();
         }
 
         Console.WriteLine($"Done!");
@@ -110,15 +123,37 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     private void PackExternalResources(string projectName)
     {
         string externalResourcesFolder = ProjectFile.GetKey("project.externalres.dir");
-        if (externalResourcesFolder != "")
-        {
-            if (!Directory.Exists(externalResourcesFolder))
-                Directory.CreateDirectory(externalResourcesFolder);
-            Packer.Pack(Path.GetFullPath(externalResourcesFolder), projectName.ToLower(), ProjectFile.GetKey("project.externalres.out"));
-        }
-        else
+        if (externalResourcesFolder == "")
         {
             Console.WriteLine("No External Resources Folder defined, no resources will be packed!");
+            return;
+        }
+
+        if (!Directory.Exists(externalResourcesFolder))
+            Directory.CreateDirectory(externalResourcesFolder);
+        Packer.Pack(Path.GetFullPath(externalResourcesFolder), projectName.ToLower(), ProjectFile.GetKey("project.externalres.out"));
+    }
+
+    private void PostBuildCommand()
+    {
+        try
+        {
+            string value = ProjectFile.GetKey("builder.commands.postbuild");
+            if (value == "none") return;
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = value;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+
+            Process process = new Process();
+            process.StartInfo = startInfo;
+            process.Start();
+        }
+        catch (System.Exception e)
+        {
+            System.Console.WriteLine(e.Message);
         }
     }
 }

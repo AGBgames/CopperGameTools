@@ -13,7 +13,7 @@ class Program
         {
             Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
             $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.");
-            Console.WriteLine($"CopperGameTools v{Constants.Version} on {Constants.BuildDate}\n" +
+            Console.WriteLine($"CopperGameTools v{Constants.Version} | Build {Constants.BuildDate}\n" +
                 "No subcommand used.\n");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -66,7 +66,7 @@ class Program
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Failed to load file!");
+                    Console.WriteLine("ContentPacker: Failed to load file!");
                 }
                 break;
             case "build+":
@@ -121,7 +121,7 @@ class Program
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Failed to load file!");
+                    Console.WriteLine("Build+: Failed to load file!");
                 }
                 break;
             case "build":
@@ -151,7 +151,7 @@ class Program
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Failed to load file!");
+                    Console.WriteLine("Build: Failed to load file!");
                 }
                 break;
 
@@ -169,7 +169,7 @@ class Program
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Failed to load file!");
+                    Console.WriteLine("Check: Failed to load file!");
                 }
                 break;
         }
