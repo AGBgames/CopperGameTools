@@ -9,11 +9,3 @@ Set of tools to ease the development of games using the CopperCube Game Engine.
 ## CGT
 
 - Command line tool used to build a project and check a .pkf file.
-
-## ContentPacker
-
-- Collects all files stored in the project.externalres.dir-Folder and zips then into a .cgc-File.
-
-## GameLauncher (WIP) 
-
-- Unzips the .cgc-File and prepares them to be load into the game on runtime.
