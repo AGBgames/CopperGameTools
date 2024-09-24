@@ -1,4 +1,5 @@
 namespace CopperGameTools.Builder;
+
 public class ProjectFileKey(string key, string value, int line)
 {
     public string Key { get; } = key;

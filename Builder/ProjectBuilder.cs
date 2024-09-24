@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using CopperGameTools.ContentPacker;
 using CopperGameTools.Shared;
 
 namespace CopperGameTools.Builder;
@@ -19,10 +18,10 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         if (ProjectFile.SourceFile.DirectoryName == null)
             return ProjectBuilderResultType.FailedWithErrors;
 
-        ProjectFileCheckResult check = ProjectFile.CheckProjectFile();
-        if (check.FoundErrors)
+        ProjectFileCheckResult checkResult = ProjectFile.CheckProjectFile();
+        if (checkResult.FoundErrors)
         {
-            Console.WriteLine($"{check.ResultErrors.Count} Error(s) have been found! Aborting...\n");
+            Console.WriteLine($"{checkResult.ResultErrors.Count} Error(s) have been found! Aborting...\n");
             return ProjectBuilderResultType.FailedWithProjectFileErrors;
         }
 
@@ -36,7 +35,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             return ProjectBuilderResultType.FailedWithProjectFileErrors;
 
         string sourceDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.src.dir"));
-        if (sourceDir == null || !Directory.Exists(sourceDir))
+        if (!Directory.Exists(sourceDir))
             return ProjectBuilderResultType.FailedWithErrors;
 
         string sourceOut = ProjectFile.GetKey("project.src.out");
@@ -44,7 +43,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             return ProjectBuilderResultType.FailedWithProjectFileErrors;
 
         string outDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.out.dir"));
-        if (outDir == null || !Directory.Exists(outDir))
+        if (!Directory.Exists(outDir))
             return ProjectBuilderResultType.FailedWithErrors;
 
         string mainFileName = ProjectFile.GetKey("project.src.main");
@@ -57,8 +56,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         Console.WriteLine($"STEP 1: Packing JavaScript Code into {sourceOut}.js...");
 
-        string toPutInOutputFile = $"// Generated using CopperGameTools v{Shared.Constants.Version} //\n";
-        toPutInOutputFile += $"//Made for CopperCube Engine v{Shared.Constants.SupportedCopperCubeVersion}. //\n";
+        string toPutInOutputFile = $"// Generated using CopperGameTools v{Constants.Version} //\n";
+        toPutInOutputFile += $"//Made for CopperCube Engine v{Constants.SupportedCopperCubeVersion}. //\n";
 
         foreach (ProjectFileKey key in ProjectFile.FileKeys)
         {
@@ -66,10 +65,10 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
 
         List<string> sourceFileList
-            = [.. (Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories))];
+            = [.. Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)];
         string mainFile = sourceDir + mainFileName;
 
-        foreach (var file in sourceFileList)
+        foreach (string file in sourceFileList)
         {
             if (file.Equals(mainFile))
                 continue;
@@ -102,14 +101,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         // Step 2: External resources
 
-        Console.WriteLine("STEP 2: Process External Resources:");
-        if (ProjectFile.GetKeyAsBoolean("project.externalres.enabled"))
-        {
-            PackExternalResources(projectName);
-        }
-
-        // Step 3: Custom Post-Build Commands
-        System.Console.WriteLine("STEP 3: Custom Post-Build Commands:");
+        // Step 2: Custom Post-Build Commands
+        Console.WriteLine("STEP 3: Custom Post-Build Commands:");
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
         {
             PostBuildCommand();
@@ -120,20 +113,6 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         return ProjectBuilderResultType.DoneNoErrors;
     }
 
-    private void PackExternalResources(string projectName)
-    {
-        string externalResourcesFolder = ProjectFile.GetKey("project.externalres.dir");
-        if (externalResourcesFolder == "")
-        {
-            Console.WriteLine("No External Resources Folder defined, no resources will be packed!");
-            return;
-        }
-
-        if (!Directory.Exists(externalResourcesFolder))
-            Directory.CreateDirectory(externalResourcesFolder);
-        Packer.Pack(Path.GetFullPath(externalResourcesFolder), projectName.ToLower(), ProjectFile.GetKey("project.externalres.out"));
-    }
-
     private void PostBuildCommand()
     {
         try
@@ -141,19 +120,21 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             string value = ProjectFile.GetKey("builder.commands.postbuild");
             if (value == "none") return;
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = value;
-            startInfo.UseShellExecute = false;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = value,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
-            Process process = new Process();
+            var process = new Process();
             process.StartInfo = startInfo;
             process.Start();
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
-            System.Console.WriteLine(e.Message);
+            Console.WriteLine(e.Message);
         }
     }
 }

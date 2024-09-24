@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;ReleaseNoDBInfo</Configurations>
+    <RootNamespace>CopperGameTools.CGT</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoDBInfo|AnyCPU'">
@@ -23,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Builder\Builder.csproj" />
-    <ProjectReference Include="..\GameLauncher\GameLauncher.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 

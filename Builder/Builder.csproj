@@ -10,6 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;ReleaseNoDBInfo</Configurations>
+    <RootNamespace>CopperGameTools.Builder</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoDBInfo|AnyCPU'">

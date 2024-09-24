@@ -7,7 +7,7 @@ public class ProjectFile
 
     public ProjectFile(FileInfo sourceFile)
     {
-        if (!sourceFile.Exists || sourceFile == null)
+        if (!sourceFile.Exists)
         {
             SourceFile = new FileInfo("");
             FileKeys = [];
@@ -39,11 +39,11 @@ public class ProjectFile
     /// </summary>
     private void LoadKeysFromFile()
     {
-        int lineNumber = 1;
+        var lineNumber = 1;
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
-            string[] split = line.Split("=");
+            var split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1], lineNumber));
             lineNumber++;
         }
@@ -51,7 +51,7 @@ public class ProjectFile
 
     public string GetKey(string searchKey)
     {
-        if (searchKey is null) return "";
+        if (string.IsNullOrEmpty(searchKey)) return "";
         foreach (ProjectFileKey key in FileKeys)
         {
             if (key.Key != searchKey) continue;
@@ -69,36 +69,10 @@ public class ProjectFile
         return "";
     }
 
-    public int GetKeyAsInt(string searchKey)
-    {
-        string key = GetKey(searchKey);
-        return key == "" ? 0 : Convert.ToInt32(key);
-    }
-    
-    public double GetKeyAsDouble(string searchKey)
-    {
-        string key = GetKey(searchKey);
-        return key == "" ? 0.0 : Convert.ToDouble(key);
-    }
-
     public bool GetKeyAsBoolean(string searchKey)
     {
-        string key = GetKey(searchKey);
+        var key = GetKey(searchKey);
         return key != "" && Convert.ToBoolean(key);
-    }
-
-    /// <summary>
-    /// Gets a Key From a Specific Line.
-    /// </summary>
-    /// <param name="line">Line to Get The Key From.</param>
-    /// <returns></returns>
-    public string GetKey(int line)
-    {
-        foreach (var key in FileKeys)
-        {
-            if (key.Line == line) return key.Value;
-        }
-        return "";
     }
 
     /// <summary>
@@ -155,8 +129,8 @@ public class ProjectFile
             lineNumber++;
         }
 
-        return errors.Count > 0 ? new ProjectFileCheckResult(CGTProjectFileCheckResultType.Errors, errors)
-            : new ProjectFileCheckResult(CGTProjectFileCheckResultType.NoErrors, new List<ProjectFileCheckError>());
+        return errors.Count > 0 ? new ProjectFileCheckResult(CgtProjectFileCheckResultType.Errors, errors)
+            : new ProjectFileCheckResult(CgtProjectFileCheckResultType.NoErrors, new List<ProjectFileCheckError>());
     }
 }
 

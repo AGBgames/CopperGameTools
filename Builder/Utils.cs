@@ -5,7 +5,7 @@ public static class Utils
     public static void PrintErrors(ProjectFileCheckResult projectFileCheckResult)
     {
         Console.WriteLine("Number of Errors: " + projectFileCheckResult.ResultErrors.Count);
-        foreach (var err in projectFileCheckResult.ResultErrors)
+        foreach (ProjectFileCheckError err in projectFileCheckResult.ResultErrors)
         {
             Console.WriteLine($"{err.ErrorText} | Error Type: {err.ErrorType}");
         }

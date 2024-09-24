@@ -2,7 +2,7 @@ using System.IO.Compression;
 
 namespace CopperGameTools.ContentPacker;
 
-public class Packer
+public abstract class Packer
 {
     /// <summary>
     /// Packs all the files from the project.externalres.dir-folder into a ZIP like file.
@@ -27,11 +27,11 @@ public class Packer
 
         string[] contentFiles = Directory.GetFiles(contentSourcePath, "*.*", SearchOption.AllDirectories);
 
-        ZipArchive zip = ZipFile.Open(zipFileName + ".cgc", ZipArchiveMode.Create);
+        ZipArchive zipArchive = ZipFile.Open(zipFileName + ".cgc", ZipArchiveMode.Create);
         foreach (string contentFile in contentFiles)
         {
             string nameOfCurrentFile = Path.GetFileName(contentFile);
-            zip.CreateEntryFromFile(contentFile, nameOfCurrentFile);
+            zipArchive.CreateEntryFromFile(contentFile, nameOfCurrentFile);
             Console.WriteLine("Written " + nameOfCurrentFile + " to cgc.");
         }
     }
@@ -49,9 +49,9 @@ public class Packer
             return;
         }
 
-        ZipArchive zip = ZipFile.Open(contentFile + ".cgc", ZipArchiveMode.Read);
+        ZipArchive zipArchive = ZipFile.Open(contentFile + ".cgc", ZipArchiveMode.Read);
         Console.WriteLine("Unpacking content to directory...");
-        zip.ExtractToDirectory(unpackFolder);
+        zipArchive.ExtractToDirectory(unpackFolder);
         Console.WriteLine("Done!");
     }
 

@@ -4,14 +4,14 @@
 /// Class-Wrapper for ProjectFileCheckResult
 /// </summary>
 /// <seealso cref="ProjectFileCheckError"/>
-public class ProjectFileCheckResult(CGTProjectFileCheckResultType resultType, List<ProjectFileCheckError> resultErrors)
+public class ProjectFileCheckResult(CgtProjectFileCheckResultType resultType, List<ProjectFileCheckError> resultErrors)
 {
-    public CGTProjectFileCheckResultType ResultType { get; } = resultType;
+    public CgtProjectFileCheckResultType ResultType { get; } = resultType;
     public List<ProjectFileCheckError> ResultErrors { get; } = resultErrors;
     public bool FoundErrors => ResultErrors.Count > 0;
 }
 
-public enum CGTProjectFileCheckResultType
+public enum CgtProjectFileCheckResultType
 {
     NoErrors,
     Errors

@@ -1,10 +1,9 @@
 using CopperGameTools.Builder;
 using CopperGameTools.Shared;
-using System.Diagnostics;
 
-namespace CopperGameTools.CLI;
+namespace CopperGameTools.CGT;
 
-class Program
+internal abstract class Program
 {
     public static void Main(String[] args)
     {
@@ -22,108 +21,6 @@ class Program
 
         switch (args[0])
         {
-            case "pack":
-                if (args.Length < 2)
-                {
-                    Console.WriteLine("pack <project file>");
-                    return;
-                }
-                try
-                {
-                    if (!Directory.Exists("Publish"))
-                        Directory.CreateDirectory("./Publish");
-
-                    ProjectFile projFile = new(new FileInfo(args[1]));
-
-                    string platform = projFile.GetKey("project.platform");
-                    if (platform == "")
-                    {
-                        Console.WriteLine("No platform specified!");
-                        return;
-                    }
-
-                    string projectFileName = projFile.GetKey("project.file");
-                    if (projectFileName == "" || !File.Exists(projectFileName))
-                    {
-                        Console.WriteLine("CopperCube-Project file not found!");
-                        return;
-                    }
-
-                    string executableFileName = Path.GetFileNameWithoutExtension(projectFileName);
-                    executableFileName += ".exe";
-
-                    string packPath = "Publish/" + platform + "/";
-
-                    if (Directory.Exists(packPath))
-                    {
-                        Directory.Delete(packPath);
-                    }
-
-                    Directory.CreateDirectory(packPath);
-
-                    Console.WriteLine("Copy " + "./Project/" + executableFileName + " to " + packPath);
-                    File.Copy("./Project/" + executableFileName, packPath + executableFileName);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("ContentPacker: Failed to load file!");
-                }
-                break;
-            case "build+":
-                if (args.Length < 2)
-                {
-                    Console.WriteLine("build+ <project file>");
-                    return;
-                }
-                try
-                {
-                    ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
-                    ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
-                    switch (builder.Build())
-                    {
-                        case ProjectBuilderResultType.DoneNoErrors:
-                            Console.WriteLine("No errors found.");
-                            break;
-                        case ProjectBuilderResultType.FailedWithErrors:
-                            Console.WriteLine("Failed due to system errors!");
-                            Utils.PrintErrors(check);
-                            break;
-                        case ProjectBuilderResultType.FailedWithProjectFileErrors:
-                            Console.WriteLine("Failed due to project file errors!");
-                            Utils.PrintErrors(check);
-                            break;
-                    }
-
-                    string projectFileName = builder.ProjectFile.GetKey("project.file");
-                    if (projectFileName == "" || !File.Exists(projectFileName))
-                    {
-                        Console.WriteLine("CopperCube-Project file not found!");
-                        return;
-                    }
-
-                    string projectPlatform = builder.ProjectFile.GetKey("project.platform");
-                    if (projectPlatform == "")
-                    {
-                        Console.WriteLine("No platform specified!");
-                        return;
-                    }
-
-                    Console.WriteLine("Creating Game Executable from Project " + projectFileName + " for " + projectPlatform);
-
-                    Process editor = new();
-
-                    editor.StartInfo.FileName = "coppercube.exe";
-                    editor.StartInfo.Arguments = $"{new FileInfo(projectFileName).FullName} -publish:{projectPlatform} -quit";
-                    editor.StartInfo.CreateNoWindow = false;
-
-                    editor.Start();
-                    editor.WaitForExit();
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Build+: Failed to load file!");
-                }
-                break;
             case "build":
                 if (args.Length < 2)
                 {
