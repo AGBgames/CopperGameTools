@@ -1,3 +1,5 @@
+using AGBgames.GameRuntime.XML;
+
 using CopperGameTools.Builder;
 using CopperGameTools.Shared;
 
