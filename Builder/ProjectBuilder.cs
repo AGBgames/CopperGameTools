@@ -29,7 +29,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         if (ProjectFile.GetKey("builder.version") != Constants.Version)
         {
-            Console.WriteLine("Project file set for different version of CopperCubeGameTools.\nSupport might be limited.");
+            Console.WriteLine("Warning: Project file set for different version of CopperCubeGameTools.\nSupport might be limited.\n");
         }
 
         string projectName = ProjectFile.GetKey("project.name");

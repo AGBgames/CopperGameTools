@@ -10,10 +10,9 @@ internal abstract class Program
         if (args.Length == 0)
         {
             Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
-            $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.");
-            Console.WriteLine($"CopperGameTools v{Constants.Version} | Build {Constants.BuildDate}\n" +
-                "No subcommand used.\n");
-            Console.WriteLine("Press any key to exit.");
+            $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.\n"+
+            $"CopperGameTools v{Constants.Version} | Build {Constants.BuildDate}\n" +
+            "No subcommand used.\n" + "Press any key to exit.");
             Console.ReadKey();
             return;
         }
@@ -21,6 +20,7 @@ internal abstract class Program
         switch (args[0])
         {
             case "build":
+            case "b":
                 if (args.Length < 2)
                 {
                     string[] files = Directory.GetFiles("./", "*.cgt");
@@ -36,22 +36,21 @@ internal abstract class Program
                     HandleBuild(args[1]);
                 }
                 break;
-
             case "check":
+            case "c":    
                 if (args.Length < 2)
                 {
-                    Console.WriteLine("check <project file>");
-                    return;
+                    string[] files = Directory.GetFiles("./", "*.cgt");
+                    if (files.Length == 0)
+                    {
+                        Console.WriteLine("build <project file>");
+                        return;
+                    }
+                    HandleCheck(files[0]);
                 }
-                try
+                else
                 {
-                    ProjectFileCheckResult check = 
-                        new ProjectFile(new FileInfo (args[1])).CheckProjectFile();
-                    Utils.PrintErrors(check);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Check: Failed to load file!");
+                    HandleCheck(args[1]);
                 }
                 break;
         }
@@ -73,5 +72,12 @@ internal abstract class Program
                 Utils.PrintErrors(check);
                 break;
         }
+    }
+
+    private static void HandleCheck(string filename)
+    {
+        ProjectFileCheckResult check = 
+            new ProjectFile(new FileInfo (filename)).CheckProjectFile();
+        Utils.PrintErrors(check);
     }
 }
