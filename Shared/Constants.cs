@@ -2,8 +2,7 @@
 
 public static class Constants
 {
-    public static readonly string Version = "0.5.1";
-    public static readonly string SupportedCopperCubeVersion = "6.6";
-    public static readonly string BuildDate = "16.06.2024 [DD.MM.YY]";
-    public static readonly string Copyright = "AGBgames 2024";
+    public const string Version = "1.0";
+    public const string SupportedCopperCubeVersion = "6.7";
+    public const string BuildDate = "24.09.2024 [DD.MM.YY]";
 }

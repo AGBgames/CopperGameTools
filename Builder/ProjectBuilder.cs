@@ -11,18 +11,20 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     /// Builds the Project defined by the .PKF Project file.
     /// </summary>
     /// <returns>Returns a ProjectBuilderResult.</returns>
-    public ProjectBuilderResultType Build()
+    public ProjectBuilderResult Build()
     {
         Console.WriteLine($"Building with CopperGameTools v{Constants.Version}");
 
         if (ProjectFile.SourceFile.DirectoryName == null)
-            return ProjectBuilderResultType.FailedWithErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
+            "ProjectFile path is null.");
 
         ProjectFileCheckResult checkResult = ProjectFile.CheckProjectFile();
         if (checkResult.FoundErrors)
         {
             Console.WriteLine($"{checkResult.ResultErrors.Count} Error(s) have been found! Aborting...\n");
-            return ProjectBuilderResultType.FailedWithProjectFileErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "ProjectFile contains errors.");
         }
 
         if (ProjectFile.GetKey("builder.version") != Constants.Version)
@@ -32,25 +34,31 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         string projectName = ProjectFile.GetKey("project.name");
         if (projectName == "")
-            return ProjectBuilderResultType.FailedWithProjectFileErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "ProjectFile:project.name is not valid.");
 
         string sourceDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.src.dir"));
         if (!Directory.Exists(sourceDir))
-            return ProjectBuilderResultType.FailedWithErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
+                "SourcePath-Dir not found.");
 
         string sourceOut = ProjectFile.GetKey("project.src.out");
         if (sourceOut == "")
-            return ProjectBuilderResultType.FailedWithProjectFileErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "ProjectFile:project.src.out is not valid.");
 
         string outDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.out.dir"));
         if (!Directory.Exists(outDir))
-            return ProjectBuilderResultType.FailedWithErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "ProjectOut-Dir not found.");
 
         string mainFileName = ProjectFile.GetKey("project.src.main");
         if (mainFileName == "")
-            return ProjectBuilderResultType.FailedWithProjectFileErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "ProjectFile:project.src.main is not valid.");
         if (!File.Exists(sourceDir + mainFileName))
-            return ProjectBuilderResultType.FailedWithErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
+                "MainSourceFile not found.");
 
         // Step 1: Packing Code Files
 
@@ -79,7 +87,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
 
         toPutInOutputFile
-            += File.ReadAllText(mainFile);
+            += "\n" + File.ReadAllText(mainFile);
 
         // add main call with args
         toPutInOutputFile
@@ -95,14 +103,15 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         catch (Exception)
         {
             Console.WriteLine("Failed to write file!");
-            return ProjectBuilderResultType.FailedWithErrors;
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
+                "SourceOut-File failed to write.");
         }
         Console.WriteLine($"Packed Source to {outDir + sourceOut + ".js"}\n");
 
         // Step 2: External resources
 
         // Step 2: Custom Post-Build Commands
-        Console.WriteLine("STEP 3: Custom Post-Build Commands:");
+        Console.WriteLine("STEP 2: Custom Post-Build Commands:");
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
         {
             PostBuildCommand();
@@ -110,7 +119,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         Console.WriteLine($"Done!");
 
-        return ProjectBuilderResultType.DoneNoErrors;
+        return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors, "Done.");
     }
 
     private void PostBuildCommand()
@@ -136,6 +145,21 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         {
             Console.WriteLine(e.Message);
         }
+    }
+}
+
+public class ProjectBuilderResult
+{
+    public ProjectBuilderResultType ResultType { get; private set; }
+    public string ResultCauseInformation { get; private set; } = "";
+
+    public static ProjectBuilderResult Of(ProjectBuilderResultType resultType, string resultCauseInformation)
+    {
+        return new ProjectBuilderResult()
+        {
+            ResultType = resultType,
+            ResultCauseInformation = resultCauseInformation
+        };
     }
 }
 

@@ -31,17 +31,15 @@ internal abstract class Program
                 {
                     ProjectBuilder builder = new(new ProjectFile(new FileInfo(args[1])));
                     ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
-                    switch (builder.Build())
+                    ProjectBuilderResult result = builder.Build();
+                    switch (result.ResultType)
                     {
                         case ProjectBuilderResultType.DoneNoErrors:
-                            Console.WriteLine("No errors found.");
                             break;
                         case ProjectBuilderResultType.FailedWithErrors:
-                            Console.WriteLine("Failed due to system errors!");
                             Utils.PrintErrors(check);
                             break;
                         case ProjectBuilderResultType.FailedWithProjectFileErrors:
-                            Console.WriteLine("Failed due to project file errors!");
                             Utils.PrintErrors(check);
                             break;
                     }
