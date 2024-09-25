@@ -8,7 +8,10 @@ public class ProjectFileCheckResult(CgtProjectFileCheckResultType resultType, Li
 {
     public CgtProjectFileCheckResultType ResultType { get; } = resultType;
     public List<ProjectFileCheckError> ResultErrors { get; } = resultErrors;
-    public bool FoundErrors => ResultErrors.Count > 0;
+    public bool FoundErrors
+    {
+        get => ResultErrors.Count > 0;
+    }
 }
 
 public enum CgtProjectFileCheckResultType
@@ -34,7 +37,6 @@ public enum ProjectFileCheckErrorType
 {
     InvalidKey,
     InvalidValue,
-    InvalidComment,
     DuplicatedKey
 }
 

@@ -8,7 +8,7 @@ internal abstract class Program
     public static void Main(String[] args)
     {
         // No subcommand used / no args?
-        if (Utils.ArrayIsEmpty(args))
+        if (args.Length == 0)
         {
             Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
             $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.");

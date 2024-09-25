@@ -10,9 +10,4 @@ public static class Utils
             Console.WriteLine($"{err.ErrorText} | Error Type: {err.ErrorType}");
         }
     }
-
-    public static bool ArrayIsEmpty(Array array)
-    {
-        return array.Length == 0;
-    }
 }

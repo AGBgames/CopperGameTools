@@ -39,11 +39,11 @@ public class ProjectFile
     /// </summary>
     private void LoadKeysFromFile()
     {
-        var lineNumber = 1;
+        int lineNumber = 1;
         foreach (var line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
-            var split = line.Split("=");
+            string[] split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1], lineNumber));
             lineNumber++;
         }
@@ -55,14 +55,12 @@ public class ProjectFile
         foreach (ProjectFileKey key in FileKeys)
         {
             if (key.Key != searchKey) continue;
-            if (key.Value.Contains('$'))
+            if (!key.Value.Contains('$')) return key.Value;
+            string[] split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
+            foreach (string t in split)
             {
-                var split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < split.Length; i++)
-                {
-                    if (string.IsNullOrEmpty(GetKey(split[i]))) continue;
-                    key.Value = GetKey(split[i]);
-                }
+                if (string.IsNullOrEmpty(GetKey(t))) continue;
+                key.Value = GetKey(t);
             }
             return key.Value;
         }
@@ -71,7 +69,7 @@ public class ProjectFile
 
     public bool GetKeyAsBoolean(string searchKey)
     {
-        var key = GetKey(searchKey);
+        string key = GetKey(searchKey);
         return key != "" && Convert.ToBoolean(key);
     }
 
@@ -83,12 +81,12 @@ public class ProjectFile
     public ProjectFileCheckResult CheckProjectFile()
     {
         var errors = new List<ProjectFileCheckError>();
-        var lineNumber = 1;
+        int lineNumber = 1;
 
         var readKeys = new List<ProjectFileKey>();
-        foreach (var line in File.ReadAllLines(SourceFile.FullName))
+        foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+            if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith($"#"))
             {
                 lineNumber++;
                 continue;
