@@ -71,6 +71,10 @@ internal abstract class Program
             case ProjectBuilderResultType.FailedWithProjectFileErrors:
                 Utils.PrintErrors(check);
                 break;
+            default:
+                Utils.Print("Detected an unexpected behaviour.", Utils.PrintLevel.Warn);
+                Utils.PrintErrors(check);
+                break;
         }
     }
 
