@@ -8,7 +8,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     public ProjectFile ProjectFile { get; } = cgtProjectFile;
 
     /// <summary>
-    /// Builds the Project defined by the .PKF Project file.
+    /// Builds the Project defined by the .CGT Project file.
     /// </summary>
     /// <returns>Returns a ProjectBuilderResult.</returns>
     public ProjectBuilderResult Build()
@@ -16,10 +16,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         Utils.Print($"Building with CopperGameTools v{Constants.Version}", Utils.PrintLevel.Info);
         
         if (ProjectFile.GetKey("builder.version") != Constants.Version)
-        {
             Utils.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
                 Utils.PrintLevel.Warn);
-        }
 
         if (ProjectFile.SourceFile.DirectoryName == null)
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
@@ -27,13 +25,11 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         ProjectFileCheckResult checkResult = ProjectFile.CheckProjectFile();
         if (checkResult.FoundErrors)
-        {
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "ProjectFile contains errors.");
-        }
 
         string projectName = ProjectFile.GetKey("project.name");
-        if (projectName == "")
+        if (projectName.Equals(""))
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "ProjectFile:project.name is not valid.");
 
@@ -43,7 +39,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
                 "SourcePath-Dir not found.");
 
         string sourceOut = ProjectFile.GetKey("project.src.out");
-        if (sourceOut == "")
+        if (sourceOut.Equals(""))
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "ProjectFile:project.src.out is not valid.");
 
@@ -53,7 +49,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
                 "ProjectOut-Dir not found.");
 
         string mainFileName = ProjectFile.GetKey("project.src.main");
-        if (mainFileName == "")
+        if (mainFileName.Equals(""))
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "ProjectFile:project.src.main is not valid.");
         if (!File.Exists(sourceDir + mainFileName))
@@ -69,9 +65,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         toPutInOutputFile += $"//Made for CopperCube Engine v{Constants.SupportedCopperCubeVersion}. //\n";
 
         foreach (ProjectFileKey key in ProjectFile.FileKeys)
-        {
             toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
-        }
 
         List<string> sourceFileList
             = [.. Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)];
@@ -99,7 +93,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         // create .js file with all the code
         try
         {
-            File.WriteAllText(outDir + sourceOut + ".js", toPutInOutputFile);
+            File.WriteAllText(Path.Combine(outDir, sourceOut, ".js"), toPutInOutputFile);
         }
         catch (Exception)
         {
@@ -107,16 +101,14 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "SourceOut-File failed to write.");
         }
-        Utils.Print($"Packed Source to {outDir + sourceOut + ".js"}\n", Utils.PrintLevel.Info);
+        Utils.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Utils.PrintLevel.Info);
 
         // Step 2: External resources
 
         // Step 2: Custom Post-Build Commands
         Utils.Print($"STEP 2: Running post-build commands:", Utils.PrintLevel.Info);
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
-        {
             PostBuildCommand();
-        }
 
         Utils.Print($"Done!", Utils.PrintLevel.Info);
 
@@ -128,7 +120,6 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         try
         {
             string value = ProjectFile.GetKey("builder.commands.postbuild");
-            if (value == "none") return;
 
             var startInfo = new ProcessStartInfo
             {
@@ -144,7 +135,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            Utils.Print(e.Message, Utils.PrintLevel.Error);
         }
     }
 }
