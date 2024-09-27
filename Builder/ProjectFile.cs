@@ -67,10 +67,10 @@ public class ProjectFile
         return "";
     }
 
-    public bool GetKeyAsBoolean(string searchKey)
+    public bool GetKeyAsBoolean(string searchKey, bool defaultValue)
     {
         string key = GetKey(searchKey);
-        return key != "" && Convert.ToBoolean(key);
+        return key != "" ? Convert.ToBoolean(key) : defaultValue;
     }
 
     /// <summary>

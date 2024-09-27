@@ -14,14 +14,26 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     public ProjectBuilderResult Build()
     {
         Utils.Print($"Building with CopperGameTools v{Constants.Version}", Utils.PrintLevel.Info);
-        
-        if (ProjectFile.GetKey("builder.version") != Constants.Version)
+
+        string version = ProjectFile.GetKey("builder.version");
+        bool versionRequired = ProjectFile.GetKeyAsBoolean("builder.require_version", false);
+
+        if (version != Constants.Version && !versionRequired)
+        {
             Utils.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
                 Utils.PrintLevel.Warn);
-
+        }
+        else if (version != Constants.Version && versionRequired)
+        {
+            Utils.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
+                Utils.PrintLevel.Error);
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors, 
+                "Incompatible version");
+        }
+        
         if (ProjectFile.SourceFile.DirectoryName == null)
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
-            "ProjectFile path is null.");
+            "ProjectFile:path is null.");
 
         ProjectFileCheckResult checkResult = ProjectFile.CheckProjectFile();
         if (checkResult.FoundErrors)
@@ -93,7 +105,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         // create .js file with all the code
         try
         {
-            File.WriteAllText(Path.Combine(outDir, sourceOut, ".js"), toPutInOutputFile);
+            File.WriteAllText(outDir + sourceOut + ".js", toPutInOutputFile);
         }
         catch (Exception)
         {
@@ -107,7 +119,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         // Step 2: Custom Post-Build Commands
         Utils.Print($"STEP 2: Running post-build commands:", Utils.PrintLevel.Info);
-        if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
+        if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled", false))
             PostBuildCommand();
 
         Utils.Print($"Done!", Utils.PrintLevel.Info);

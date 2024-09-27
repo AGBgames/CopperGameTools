@@ -26,7 +26,7 @@ internal abstract class Program
                     string[] files = Directory.GetFiles("./", "*.cgt");
                     if (files.Length == 0)
                     {
-                        Console.WriteLine("build <project file>");
+                        Utils.Print("No project file found.", Utils.PrintLevel.Info);
                         return;
                     }
                     HandleBuild(files[0]);
@@ -43,7 +43,7 @@ internal abstract class Program
                     string[] files = Directory.GetFiles("./", "*.cgt");
                     if (files.Length == 0)
                     {
-                        Console.WriteLine("build <project file>");
+                        Utils.Print("No project file found.", Utils.PrintLevel.Info);
                         return;
                     }
                     HandleCheck(files[0]);
