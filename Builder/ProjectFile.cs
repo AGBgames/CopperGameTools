@@ -73,6 +73,12 @@ public class ProjectFile
         return key != "" ? Convert.ToBoolean(key) : defaultValue;
     }
 
+    public void SetKey(string searchkey, string value)
+    {
+        ProjectFileKey key = FileKeys.Find(key => key.Key == searchkey) ?? throw new InvalidOperationException();
+        key.Value = value;
+    }
+
     /// <summary>
     /// Initiates a Check of the Project file.
     /// </summary>
