@@ -1,5 +1,3 @@
-using AGBgames.GameRuntime.XML;
-
 using CopperGameTools.Builder;
 using CopperGameTools.Shared;
 
@@ -11,10 +9,10 @@ internal abstract class Program
     {
         if (args.Length == 0)
         {
-            Console.WriteLine($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
+            Utils.Print($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
             $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.\n"+
             $"CopperGameTools v{Constants.Version} | Build {Constants.BuildDate}\n" +
-            "No subcommand used.\n" + "Press any key to exit.");
+            "No subcommand used.\n" + "Press any key to exit.", Utils.PrintLevel.Info);
             Console.ReadKey();
             return;
         }
