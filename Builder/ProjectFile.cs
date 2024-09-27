@@ -40,7 +40,7 @@ public class ProjectFile
     private void LoadKeysFromFile()
     {
         int lineNumber = 1;
-        foreach (var line in File.ReadAllLines(SourceFile.FullName))
+        foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
             string[] split = line.Split("=");
@@ -114,13 +114,10 @@ public class ProjectFile
 
             foreach (var key in readKeys)
             {
-                if (key.Key == keyToAdd.Key)
-                {
-                    errors.Add(
-                        new ProjectFileCheckError(ProjectFileCheckErrorType.DuplicatedKey, $"[{lineNumber}] {line}"));
-                    lineNumber++;
-                    continue;
-                }
+                if (key.Key != keyToAdd.Key) continue;
+                errors.Add(
+                    new ProjectFileCheckError(ProjectFileCheckErrorType.DuplicatedKey, $"[{lineNumber}] {line}"));
+                lineNumber++;
             }
 
             readKeys.Add(keyToAdd);
