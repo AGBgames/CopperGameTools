@@ -52,4 +52,11 @@ public static class Logging
         Log += fullMessage + "\n";
         Console.ResetColor();
     }
+
+    public static void WriteLog(string filename)
+    {
+        if (!Directory.Exists("./.cgt/"))
+            Directory.CreateDirectory("./.cgt/");
+        File.WriteAllText($"./.cgt/{filename}", Logging.Log);
+    }
 }

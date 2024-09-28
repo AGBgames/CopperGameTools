@@ -13,17 +13,17 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     /// <returns>Returns a ProjectBuilderResult.</returns>
     public ProjectBuilderResult Build()
     {
-        Logging.Print($"Building with CopperGameTools v{Constants.Version}", Logging.PrintLevel.Info);
+        Logging.Print($"Building with CopperGameTools v{CopperGameToolsInfo.Version}", Logging.PrintLevel.Info);
 
         string version = ProjectFile.GetKey("builder.version");
         bool versionRequired = ProjectFile.GetKeyAsBoolean("builder.require_version", false);
 
-        if (version != Constants.Version && !versionRequired)
+        if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && !versionRequired)
         {
             Logging.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
                 Logging.PrintLevel.Warn);
         }
-        else if (version != Constants.Version && versionRequired)
+        else if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && versionRequired)
         {
             Logging.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
                 Logging.PrintLevel.Error);
@@ -73,8 +73,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         Logging.Print($"STEP 1: Packing JavaScript Code into {sourceOut}.js:",
             Logging.PrintLevel.Info);
 
-        string toPutInOutputFile = $"// Generated using CopperGameTools v{Constants.Version} //\n";
-        toPutInOutputFile += $"//Made for CopperCube Engine v{Constants.SupportedCopperCubeVersion}. //\n";
+        string toPutInOutputFile = $"// Generated using CopperGameTools v{Shared.CopperGameToolsInfo.Version} //\n";
+        toPutInOutputFile += $"//Made for CopperCube Engine v{Shared.CopperGameToolsInfo.SupportedCopperCubeVersion}. //\n";
 
         foreach (ProjectFileKey key in ProjectFile.FileKeys)
             toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
@@ -126,7 +126,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors, "Done.");
     }
-
+    
     private void PostBuildCommand()
     {
         try
