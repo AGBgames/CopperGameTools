@@ -11,7 +11,7 @@ public class ProjectFile
         {
             SourceFile = new FileInfo("");
             FileKeys = [];
-            Console.WriteLine($"The project file {sourceFile} does not exists / could not be found! Aborting.");
+            Utils.Print($"The project file {sourceFile} does not exists / could not be found! Aborting.", Utils.PrintLevel.Error);
             return;
         }
 
@@ -19,19 +19,6 @@ public class ProjectFile
         FileKeys = [];
 
         LoadKeysFromFile();
-    }
-
-    public void RefreshKeysFromFile()
-    {
-        try
-        {
-            FileKeys.Clear();
-            LoadKeysFromFile();
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("Error while reloading keys!");
-        }
     }
 
     /// <summary>

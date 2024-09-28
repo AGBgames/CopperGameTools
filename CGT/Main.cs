@@ -37,7 +37,7 @@ internal abstract class Program
                 }
                 break;
             case "check":
-            case "c":    
+            case "c":
                 if (args.Length < 2)
                 {
                     string[] files = Directory.GetFiles("./", "*.cgt");
