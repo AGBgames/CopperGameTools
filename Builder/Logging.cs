@@ -1,6 +1,6 @@
 ﻿namespace CopperGameTools.Builder;
 
-public static class Utils
+public static class Logging
 {
     public static void PrintErrors(ProjectFileCheckResult projectFileCheckResult)
     {
@@ -15,6 +15,8 @@ public static class Utils
             Print($"{err.ErrorText} | Error Type: {err.ErrorType}", PrintLevel.Error);
         }
     }
+    
+    public static string Log { get; private set; } = "";
 
     public enum PrintLevel
     {
@@ -27,21 +29,27 @@ public static class Utils
     {
         DateTime now = DateTime.Now;
         string time = now.ToString("hh:mm");
+
+        string fullMessage = "";
         
         switch (printLevel)
         {
             case PrintLevel.Info:
-                Console.WriteLine($"[Info/{time}]: {message}");
+                fullMessage = $"[Info/{time}]: {message}";
+                Console.WriteLine(fullMessage);
                 break;
             case PrintLevel.Warn:
+                fullMessage = $"[Warn/{time}]: {message}";
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[Warn/{time}]: {message}");
+                Console.WriteLine(fullMessage);
                 break;
             case PrintLevel.Error:
+                fullMessage = $"[Error/{time}]: {message}";
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[Error/{time}]: {message}");
+                Console.WriteLine(fullMessage);
                 break;
         }
+        Log += fullMessage + "\n";
         Console.ResetColor();
     }
 }

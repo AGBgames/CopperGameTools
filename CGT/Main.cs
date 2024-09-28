@@ -9,10 +9,10 @@ internal abstract class Program
     {
         if (args.Length == 0)
         {
-            Utils.Print($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
+            Logging.Print($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
                 $"At the time of this build, version {Constants.SupportedCopperCubeVersion} is the latest supported one.\n"+
                 $"CopperGameTools v{Constants.Version} | Build {Constants.BuildDate}\n\n" +
-                "No subcommand used.\n" + "Press any key to exit.", Utils.PrintLevel.Info);
+                "No subcommand used.\n" + "Press any key to exit.", Logging.PrintLevel.Info);
             Console.ReadKey();
             return;
         }
@@ -26,7 +26,7 @@ internal abstract class Program
                     string[] files = Directory.GetFiles("./", "*.cgt");
                     if (files.Length == 0)
                     {
-                        Utils.Print("No project file found.", Utils.PrintLevel.Info);
+                        Logging.Print("No project file found.", Logging.PrintLevel.Info);
                         return;
                     }
                     HandleBuild(files[0]);
@@ -43,7 +43,7 @@ internal abstract class Program
                     string[] files = Directory.GetFiles("./", "*.cgt");
                     if (files.Length == 0)
                     {
-                        Utils.Print("No project file found.", Utils.PrintLevel.Info);
+                        Logging.Print("No project file found.", Logging.PrintLevel.Info);
                         return;
                     }
                     HandleCheck(files[0]);
@@ -54,6 +54,10 @@ internal abstract class Program
                 }
                 break;
         }
+        
+        if (!Directory.Exists("./.cgt/"))
+            Directory.CreateDirectory("./.cgt/");
+        File.WriteAllText("./.cgt/latest.log", Logging.Log);
     }
 
     private static void HandleBuild(string filename)
@@ -66,14 +70,14 @@ internal abstract class Program
             case ProjectBuilderResultType.DoneNoErrors:
                 break;
             case ProjectBuilderResultType.FailedWithErrors:
-                Utils.PrintErrors(check);
+                Logging.PrintErrors(check);
                 break;
             case ProjectBuilderResultType.FailedWithProjectFileErrors:
-                Utils.PrintErrors(check);
+                Logging.PrintErrors(check);
                 break;
             default:
-                Utils.Print("Detected an unexpected behaviour.", Utils.PrintLevel.Warn);
-                Utils.PrintErrors(check);
+                Logging.Print("Detected an unexpected behaviour.", Logging.PrintLevel.Warn);
+                Logging.PrintErrors(check);
                 break;
         }
     }
@@ -82,6 +86,6 @@ internal abstract class Program
     {
         ProjectFileCheckResult check = 
             new ProjectFile(new FileInfo (filename)).CheckProjectFile();
-        Utils.PrintErrors(check);
+        Logging.PrintErrors(check);
     }
 }

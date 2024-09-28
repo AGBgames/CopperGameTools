@@ -13,20 +13,20 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     /// <returns>Returns a ProjectBuilderResult.</returns>
     public ProjectBuilderResult Build()
     {
-        Utils.Print($"Building with CopperGameTools v{Constants.Version}", Utils.PrintLevel.Info);
+        Logging.Print($"Building with CopperGameTools v{Constants.Version}", Logging.PrintLevel.Info);
 
         string version = ProjectFile.GetKey("builder.version");
         bool versionRequired = ProjectFile.GetKeyAsBoolean("builder.require_version", false);
 
         if (version != Constants.Version && !versionRequired)
         {
-            Utils.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
-                Utils.PrintLevel.Warn);
+            Logging.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
+                Logging.PrintLevel.Warn);
         }
         else if (version != Constants.Version && versionRequired)
         {
-            Utils.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
-                Utils.PrintLevel.Error);
+            Logging.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
+                Logging.PrintLevel.Error);
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors, 
                 "Incompatible version");
         }
@@ -70,8 +70,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         // Step 1: Packing Code Files
 
-        Utils.Print($"STEP 1: Packing JavaScript Code into {sourceOut}.js:",
-            Utils.PrintLevel.Info);
+        Logging.Print($"STEP 1: Packing JavaScript Code into {sourceOut}.js:",
+            Logging.PrintLevel.Info);
 
         string toPutInOutputFile = $"// Generated using CopperGameTools v{Constants.Version} //\n";
         toPutInOutputFile += $"//Made for CopperCube Engine v{Constants.SupportedCopperCubeVersion}. //\n";
@@ -90,7 +90,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             FileInfo info = new(file);
             toPutInOutputFile += $"// -- {info.Name.ToUpper()} -- //" +
                 $"\n{File.ReadAllText(file)}\n";
-            Utils.Print($"Wrote {info.Name} to packed source file.", Utils.PrintLevel.Info);
+            Logging.Print($"Wrote {info.Name} to packed source file.", Logging.PrintLevel.Info);
         }
 
         toPutInOutputFile
@@ -109,20 +109,20 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
         catch (Exception)
         {
-            Utils.Print("Failed to write file!", Utils.PrintLevel.Error);
+            Logging.Print("Failed to write file!", Logging.PrintLevel.Error);
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "SourceOut-File failed to write.");
         }
-        Utils.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Utils.PrintLevel.Info);
+        Logging.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Logging.PrintLevel.Info);
 
         // Step 2: External resources
 
         // Step 2: Custom Post-Build Commands
-        Utils.Print($"STEP 2: Running post-build commands:", Utils.PrintLevel.Info);
+        Logging.Print($"STEP 2: Running post-build commands:", Logging.PrintLevel.Info);
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled", false))
             PostBuildCommand();
 
-        Utils.Print($"Done!", Utils.PrintLevel.Info);
+        Logging.Print($"Done!", Logging.PrintLevel.Info);
 
         return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors, "Done.");
     }
@@ -147,7 +147,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
         catch (Exception e)
         {
-            Utils.Print(e.Message, Utils.PrintLevel.Error);
+            Logging.Print(e.Message, Logging.PrintLevel.Error);
         }
     }
 }

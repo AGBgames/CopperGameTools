@@ -11,7 +11,7 @@ public class ProjectFile
         {
             SourceFile = new FileInfo("");
             FileKeys = [];
-            Utils.Print($"The project file {sourceFile} does not exists / could not be found! Aborting.", Utils.PrintLevel.Error);
+            Logging.Print($"The project file {sourceFile} does not exists / could not be found! Aborting.", Logging.PrintLevel.Error);
             return;
         }
 
