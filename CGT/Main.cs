@@ -17,64 +17,47 @@ internal abstract class Program
             return;
         }
 
+        string file = GetProjectFile(args);
+
+        if (!File.Exists(file))
+        {
+            Logging.Print($"File {file} is not valid.", Logging.PrintLevel.Error);
+            return;
+        }
+
         switch (args[0])
         {
             case "build":
             case "b":
-                if (args.Length < 2)
-                {
-                    string[] files = Directory.GetFiles("./", "*.cgt");
-                    if (files.Length == 0)
-                    {
-                        Logging.Print("No project file found.", Logging.PrintLevel.Info);
-                        return;
-                    }
-                    HandleBuild(files[0]);
-                }
-                else
-                {
-                    HandleBuild(args[1]);
-                }
+                HandleBuild(file);
                 break;
             case "check":
             case "c":
-                if (args.Length < 2)
-                {
-                    string[] files = Directory.GetFiles("./", "*.cgt");
-                    if (files.Length == 0)
-                    {
-                        Logging.Print("No project file found.", Logging.PrintLevel.Info);
-                        return;
-                    }
-                    HandleCheck(files[0]);
-                }
-                else
-                {
-                    HandleCheck(args[1]);
-                }
+                HandleCheck(file);
                 break;
             case "info":
             case "i":
-                if (args.Length < 2)
-                {
-                    string[] files = Directory.GetFiles("./", "*.cgt");
-                    if (files.Length == 0)
-                    {
-                        Logging.Print("No project file found.", Logging.PrintLevel.Info);
-                        return;
-                    }
-                    HandleInfo(files[0]);
-                }
-                else
-                {
-                    HandleInfo(args[1]);
-                }
+                HandleInfo(file);
                 break;
         }
     }
 
+    private static string GetProjectFile(string[] args)
+    {
+        if (args.Length < 2)
+        {
+            string[] files = Directory.GetFiles("./", "*.cgt");
+            if (files.Length != 0) return files[0];
+            Logging.Print("No project file found.", Logging.PrintLevel.Info);
+            return "";
+        }
+        return args[1];
+    }
+
     private static void HandleBuild(string filename)
     {
+        if (filename.Equals("")) return;
+        
         ProjectBuilder builder = new(new ProjectFile(new FileInfo(filename)));
         ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
         ProjectBuilderResult result = builder.Build();
@@ -99,6 +82,8 @@ internal abstract class Program
 
     private static void HandleCheck(string filename)
     {
+        if (filename.Equals("")) return;
+        
         ProjectFileCheckResult check = 
             new ProjectFile(new FileInfo (filename)).CheckProjectFile();
         Logging.PrintErrors(check);
@@ -108,6 +93,8 @@ internal abstract class Program
 
     private static void HandleInfo(string filename)
     {
+        if (filename.Equals("")) return;
+        
         Logging.Print($"Reading project file {filename}", Logging.PrintLevel.Info);
         var file = new ProjectFile(new FileInfo(filename));
         Logging.PrintErrors(file.CheckProjectFile());
