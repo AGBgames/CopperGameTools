@@ -82,11 +82,10 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         List<string> sourceFileList
             = [.. Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)];
         string mainFile = sourceDir + mainFileName;
+        sourceFileList.Remove(mainFile);
 
         foreach (string file in sourceFileList)
         {
-            if (file.Equals(mainFile))
-                continue;
             FileInfo info = new(file);
             toPutInOutputFile += $"// -- {info.Name.ToUpper()} -- //" +
                 $"\n{File.ReadAllText(file)}\n";
@@ -94,11 +93,11 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         }
 
         toPutInOutputFile
-            += "\n" + File.ReadAllText(mainFile);
+            += File.ReadAllText(mainFile);
 
         // add main call with args
         toPutInOutputFile
-            += "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
+            += "\n" + "Main(ccbGetCopperCubeVariable('project.src.args').split(' '));";
 
         toPutInOutputFile = toPutInOutputFile.Replace("\n\n", "\n");
 
