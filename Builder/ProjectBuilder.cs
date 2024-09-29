@@ -13,6 +13,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     /// <returns>Returns a ProjectBuilderResult.</returns>
     public ProjectBuilderResult Build()
     {
+        DateTime start = DateTime.Now;
+        
         Logging.Print($"Building with CopperGameTools v{CopperGameToolsInfo.Version}", Logging.PrintLevel.Info);
 
         string version = ProjectFile.GetKey("builder.version");
@@ -89,7 +91,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             FileInfo info = new(file);
             toPutInOutputFile += $"// -- {info.Name.ToUpper()} -- //" +
                 $"\n{File.ReadAllText(file)}\n";
-            Logging.Print($"Wrote {info.Name} to packed source file.", Logging.PrintLevel.Info);
+            Logging.Print($"Added {info.Name} to ouput.", Logging.PrintLevel.Info);
         }
 
         toPutInOutputFile
@@ -105,6 +107,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         try
         {
             File.WriteAllText(outDir + sourceOut + ".js", toPutInOutputFile);
+            Logging.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Logging.PrintLevel.Info);
         }
         catch (Exception)
         {
@@ -112,16 +115,16 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
                 "SourceOut-File failed to write.");
         }
-        Logging.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Logging.PrintLevel.Info);
-
-        // Step 2: External resources
 
         // Step 2: Custom Post-Build Commands
         Logging.Print($"STEP 2: Running post-build commands:", Logging.PrintLevel.Info);
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled", false))
             PostBuildCommand();
+        
+        DateTime end = DateTime.Now;
+        TimeSpan duration = end - start;
 
-        Logging.Print($"Done!", Logging.PrintLevel.Info);
+        Logging.Print($"Done in {duration.Milliseconds}ms!", Logging.PrintLevel.Info);
 
         return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors, "Done.");
     }
