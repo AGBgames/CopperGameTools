@@ -1,6 +1,6 @@
 ﻿namespace CopperGameTools.Builder;
 
-public static class Logging
+public abstract class Logging
 {
     public static void PrintErrors(ProjectFileCheckResult projectFileCheckResult)
     {
@@ -15,8 +15,8 @@ public static class Logging
             Print($"{err.ErrorText} | Error Type: {err.ErrorType}", PrintLevel.Error);
         }
     }
-    
-    public static string Log { get; private set; } = "";
+
+    private static string Log { get; set; } = "";
 
     public enum PrintLevel
     {
