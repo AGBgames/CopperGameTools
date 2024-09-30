@@ -26,13 +26,11 @@ public class ProjectFile
     /// </summary>
     private void LoadKeysFromFile()
     {
-        int lineNumber = 1;
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
             if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
             string[] split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1]));
-            lineNumber++;
         }
     }
 
