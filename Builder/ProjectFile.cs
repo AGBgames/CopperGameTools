@@ -31,7 +31,7 @@ public class ProjectFile
         {
             if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
             string[] split = line.Split("=");
-            FileKeys.Add(new ProjectFileKey(split[0], split[1], lineNumber));
+            FileKeys.Add(new ProjectFileKey(split[0], split[1]));
             lineNumber++;
         }
     }
@@ -96,8 +96,7 @@ public class ProjectFile
             string[] keySplit = line.Split('=');
             var keyToAdd = new ProjectFileKey(
                 keySplit[0],
-                keySplit[1],
-                lineNumber);
+                keySplit[1]);
 
             foreach (ProjectFileKey key in readKeys)
             {
