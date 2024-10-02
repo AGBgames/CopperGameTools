@@ -113,18 +113,21 @@ internal abstract class Program
         string projectName = file.GetKey(ProjectFileKeys.ProjectName);
         if (!projectName.Equals(ProjectFileKeys.InvalidKey))
             Logging.Print($"Project name: {projectName}", Logging.PrintLevel.Info);
+        
         string sourceDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectSourceDirectory));
         if (!sourceDir.Equals(ProjectFileKeys.InvalidKey))
         {
             if (Directory.Exists(sourceDir))
                 Logging.Print($"Source directory: {sourceDir}", Logging.PrintLevel.Info);
         }
+        
         string sourceOut = file.GetKey(ProjectFileKeys.ProjectOutputFilename);
         if (!sourceOut.Equals(ProjectFileKeys.InvalidKey))
         {
             if (File.Exists(sourceOut))
                 Logging.Print($"Output name: {sourceOut}", Logging.PrintLevel.Info);
         }
+        
         string outDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectOutputDirectory));
         if (!outDir.Equals(ProjectFileKeys.InvalidKey))
         {
