@@ -24,20 +24,31 @@ internal abstract class Program
             return;
         }
 
-        switch (args[0])
+        try
         {
-            case "build":
-            case "b":
-                HandleBuild(file);
-                break;
-            case "check":
-            case "c":
-                HandleCheck(file);
-                break;
-            case "info":
-            case "i":
-                HandleInfo(file);
-                break;
+            switch (args[0])
+            {
+                case "build":
+                case "b":
+                    HandleBuild(file);
+                    break;
+                case "check":
+                case "c":
+                    HandleCheck(file);
+                    break;
+                case "info":
+                case "i":
+                    HandleInfo(file);
+                    break;
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Logging.Print($"File {file} not found.", Logging.PrintLevel.Error);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Logging.Print($"Failed to access {file}", Logging.PrintLevel.Error);
         }
     }
 
@@ -117,7 +128,7 @@ internal abstract class Program
         string sourceOut = file.GetKey(ProjectFileKeys.ProjectOutputFilename);
         if (!sourceOut.Equals(ProjectFileKeys.InvalidKey))
         {
-            if (Directory.Exists(sourceOut))
+            if (File.Exists(sourceOut))
                 Logging.Print($"Output name: {sourceOut}", Logging.PrintLevel.Info);
         }
         string outDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectOutputDirectory));
