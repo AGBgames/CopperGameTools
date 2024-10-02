@@ -17,8 +17,7 @@ internal abstract class Program
             return;
         }
 
-        string file = GetProjectFile(args);
-
+        string file = GetProjectFilename(args);
         if (!File.Exists(file) || string.IsNullOrEmpty(file) || string.IsNullOrWhiteSpace(file))
         {
             Logging.Print($"File {file} is not valid.", Logging.PrintLevel.Error);
@@ -42,16 +41,13 @@ internal abstract class Program
         }
     }
 
-    private static string GetProjectFile(string[] args)
+    private static string GetProjectFilename(string[] args)
     {
-        if (args.Length < 2)
-        {
-            string[] files = Directory.GetFiles("./", "*.cgt");
-            if (files.Length != 0) return files[0];
-            Logging.Print("No project file found.", Logging.PrintLevel.Info);
-            return "";
-        }
-        return args[1];
+        if (args.Length >= 2) return args[1];
+        string[] files = Directory.GetFiles("./", "*.cgt");
+        if (files.Length != 0) return files[0];
+        Logging.Print("No project file found.", Logging.PrintLevel.Info);
+        return "";
     }
 
     private static void HandleBuild(string filename)
@@ -78,7 +74,7 @@ internal abstract class Program
         }
         
         
-        Logging.WriteLog("build-latest.log");
+        Logging.WriteLog(CopperGameToolsInfo.BuildLogFilename);
     }
 
     private static void HandleCheck(string filename)
@@ -89,7 +85,7 @@ internal abstract class Program
         
         Logging.Print($"Check result: {check.ResultType.ToString()}", Logging.PrintLevel.Info);
         
-        Logging.WriteLog("check-latest.log");
+        Logging.WriteLog(CopperGameToolsInfo.CheckLogFilename);
     }
 
     private static void HandleInfo(string filename)
@@ -133,6 +129,6 @@ internal abstract class Program
                 Logging.Print($"Output directory: {outDir}", Logging.PrintLevel.Info);
         }
         
-        Logging.WriteLog("info-latest.log");
+        Logging.WriteLog(CopperGameToolsInfo.BuildLogFilename);
     }
 }
