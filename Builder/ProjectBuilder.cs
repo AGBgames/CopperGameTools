@@ -23,7 +23,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && !versionRequired)
         {
             Logging.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
-                Logging.PrintLevel.Warn);
+                Logging.PrintLevel.Warning);
         }
         else if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && versionRequired)
         {

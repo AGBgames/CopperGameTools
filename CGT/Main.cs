@@ -65,15 +65,18 @@ internal abstract class Program
                 break;
             case ProjectBuilderResultType.FailedWithErrors:
                 Logging.PrintErrors(check);
+                Logging.Print($"Cause: {result.ResultCauseInformation}", Logging.PrintLevel.Info);
                 break;
             case ProjectBuilderResultType.FailedWithProjectFileErrors:
                 Logging.PrintErrors(check);
+                Logging.Print($"Cause: {result.ResultCauseInformation}", Logging.PrintLevel.Info);
                 break;
             default:
-                Logging.Print("Detected an unexpected behaviour.", Logging.PrintLevel.Warn);
+                Logging.Print("Detected an unexpected behaviour.", Logging.PrintLevel.Warning);
                 Logging.PrintErrors(check);
                 break;
         }
+        
         
         Logging.WriteLog("build-latest.log");
     }

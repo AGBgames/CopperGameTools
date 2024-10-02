@@ -2,6 +2,8 @@
 
 public abstract class Logging
 {
+    private static string Log { get; set; } = "";
+    
     public static void PrintErrors(ProjectFileCheckResult projectFileCheckResult)
     {
         if (projectFileCheckResult.ResultErrors.Count == 0)
@@ -9,20 +11,18 @@ public abstract class Logging
             Print("No errors found.", PrintLevel.Info);
             return;
         }
-        Print("Number of Errors: " + projectFileCheckResult.ResultErrors.Count, PrintLevel.Warn);
+        Print("Number of Errors: " + projectFileCheckResult.ResultErrors.Count, PrintLevel.Warning);
         foreach (ProjectFileCheckError err in projectFileCheckResult.ResultErrors)
         {
             Print($"{err.ErrorText} | Error Type: {err.ErrorType}", PrintLevel.Error);
         }
     }
 
-    private static string Log { get; set; } = "";
-
     public enum PrintLevel
     {
         Info,
-        Warn,
-        Error,
+        Warning,
+        Error
     }
     
     public static void Print(string message, PrintLevel printLevel)
@@ -30,25 +30,26 @@ public abstract class Logging
         DateTime now = DateTime.Now;
         string time = now.ToString("hh:mm");
 
-        string fullMessage = "";
+        string fullMessage;
         
         switch (printLevel)
         {
             case PrintLevel.Info:
                 fullMessage = $"[Info/{time}]: {message}";
-                Console.WriteLine(fullMessage);
                 break;
-            case PrintLevel.Warn:
+            case PrintLevel.Warning:
                 fullMessage = $"[Warn/{time}]: {message}";
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(fullMessage);
                 break;
             case PrintLevel.Error:
                 fullMessage = $"[Error/{time}]: {message}";
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(fullMessage);
+                break;
+            default:
+                fullMessage = $"[Unknown/{time}]: {message}";
                 break;
         }
+        Console.WriteLine(fullMessage);
         Log += fullMessage + "\n";
         Console.ResetColor();
     }
@@ -57,6 +58,6 @@ public abstract class Logging
     {
         if (!Directory.Exists("./.cgt/"))
             Directory.CreateDirectory("./.cgt/");
-        File.WriteAllText($"./.cgt/{filename}", Logging.Log);
+        File.WriteAllText($"./.cgt/{filename}", Log);
     }
 }
