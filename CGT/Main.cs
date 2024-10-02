@@ -10,8 +10,8 @@ internal abstract class Program
         if (args.Length == 0)
         {
             Logging.Print($"Please make sure to keep CGT updated to ensure it works with newer CopperCube Engine Versions.\n" +
-                $"At the time of this build, version {Shared.CopperGameToolsInfo.SupportedCopperCubeVersion} is the latest supported one.\n"+
-                $"CopperGameTools v{Shared.CopperGameToolsInfo.Version} | Build {Shared.CopperGameToolsInfo.BuildDate}\n\n" +
+                $"At the time of this build, version {CopperGameToolsInfo.SupportedCopperCubeVersion} is the latest supported one.\n"+
+                $"CopperGameTools v{CopperGameToolsInfo.Version} | Build {CopperGameToolsInfo.BuildDate}\n\n" +
                 "No subcommand used.\n" + "Press any key to exit.", Logging.PrintLevel.Info);
             Console.ReadKey();
             return;

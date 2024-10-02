@@ -75,8 +75,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         Logging.Print($"STEP 1: Packing JavaScript Code into {sourceOut}.js:",
             Logging.PrintLevel.Info);
 
-        string toPutInOutputFile = $"// Generated using CopperGameTools v{Shared.CopperGameToolsInfo.Version} //\n";
-        toPutInOutputFile += $"//Made for CopperCube Engine v{Shared.CopperGameToolsInfo.SupportedCopperCubeVersion}. //\n";
+        string toPutInOutputFile = $"// Generated using CopperGameTools v{CopperGameToolsInfo.Version} //\n";
+        toPutInOutputFile += $"//Made for CopperCube Engine v{CopperGameToolsInfo.SupportedCopperCubeVersion}. //\n";
 
         foreach (ProjectFileKey key in ProjectFile.FileKeys)
             toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
@@ -91,7 +91,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             FileInfo info = new(file);
             toPutInOutputFile += $"// -- {info.Name.ToUpper()} -- //" +
                 $"\n{File.ReadAllText(file)}\n";
-            Logging.Print($"Added {info.Name} to ouput.", Logging.PrintLevel.Info);
+            Logging.Print($"Added {info.Name} to output.", Logging.PrintLevel.Info);
         }
 
         toPutInOutputFile
