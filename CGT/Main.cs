@@ -61,11 +61,9 @@ internal abstract class Program
                 break;
             case ProjectBuilderResultType.FailedWithErrors:
                 Logging.PrintErrors(check);
-                Logging.Print($"Cause: {result.ResultCauseInformation}", Logging.PrintLevel.Info);
                 break;
             case ProjectBuilderResultType.FailedWithProjectFileErrors:
                 Logging.PrintErrors(check);
-                Logging.Print($"Cause: {result.ResultCauseInformation}", Logging.PrintLevel.Info);
                 break;
             default:
                 Logging.Print("Detected an unexpected behaviour.", Logging.PrintLevel.Warning);
@@ -100,30 +98,30 @@ internal abstract class Program
         Logging.Print("Checking project file: ", Logging.PrintLevel.Info);
         Logging.PrintErrors(file.CheckProjectFile());
         
-        string version = file.GetKey("builder.version");
+        string version = file.GetKey(ProjectFileKeys.BuilderVersion);
         bool isCompatible = version is CopperGameToolsInfo.Version or CopperGameToolsInfo.MajorVersion;
-        if (!version.Equals(""))
+        if (!version.Equals(ProjectFileKeys.InvalidKey))
             Logging.Print($"Projects CGT Version: {version} | Compatible with installation: {isCompatible}", Logging.PrintLevel.Info);
-        bool requiresVersion = file.GetKeyAsBoolean("builder.require_version", false);
+        bool requiresVersion = file.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion, false);
         Logging.Print($"Requires specific CGT Version: {requiresVersion}", Logging.PrintLevel.Info);
         
-        string projectName = file.GetKey("project.name");
-        if (!projectName.Equals(""))
+        string projectName = file.GetKey(ProjectFileKeys.ProjectName);
+        if (!projectName.Equals(ProjectFileKeys.InvalidKey))
             Logging.Print($"Project name: {projectName}", Logging.PrintLevel.Info);
-        string sourceDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey("project.src.dir"));
-        if (!sourceDir.Equals(""))
+        string sourceDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectSourceDirectory));
+        if (!sourceDir.Equals(ProjectFileKeys.InvalidKey))
         {
             if (Directory.Exists(sourceDir))
                 Logging.Print($"Source directory: {sourceDir}", Logging.PrintLevel.Info);
         }
-        string sourceOut = file.GetKey("project.src.out");
-        if (!sourceOut.Equals(""))
+        string sourceOut = file.GetKey(ProjectFileKeys.ProjectOutputFilename);
+        if (!sourceOut.Equals(ProjectFileKeys.InvalidKey))
         {
             if (Directory.Exists(sourceOut))
                 Logging.Print($"Output name: {sourceOut}", Logging.PrintLevel.Info);
         }
-        string outDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey("project.out.dir"));
-        if (!outDir.Equals(""))
+        string outDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectOutputDirectory));
+        if (!outDir.Equals(ProjectFileKeys.InvalidKey))
         {
             if (Directory.Exists(outDir))
                 Logging.Print($"Output directory: {outDir}", Logging.PrintLevel.Info);

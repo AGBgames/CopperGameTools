@@ -17,8 +17,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         
         Logging.Print($"Building with CopperGameTools v{CopperGameToolsInfo.Version}", Logging.PrintLevel.Info);
 
-        string version = ProjectFile.GetKey("builder.version");
-        bool versionRequired = ProjectFile.GetKeyAsBoolean("builder.require_version", false);
+        string version = ProjectFile.GetKey(ProjectFileKeys.BuilderVersion);
+        bool versionRequired = ProjectFile.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion, false);
 
         if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && !versionRequired)
         {
@@ -29,46 +29,37 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         {
             Logging.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
                 Logging.PrintLevel.Error);
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors, 
-                "Incompatible version");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
         }
         
         if (ProjectFile.SourceFile.DirectoryName == null)
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
-            "ProjectFile:path is null.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors);
 
         ProjectFileCheckResult checkResult = ProjectFile.CheckProjectFile();
         if (checkResult.FoundErrors)
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "ProjectFile contains errors.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
 
-        string projectName = ProjectFile.GetKey("project.name");
-        if (projectName.Equals(""))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "ProjectFile:project.name is not valid.");
+        string projectName = ProjectFile.GetKey(ProjectFileKeys.ProjectName);
+        if (projectName.Equals(ProjectFileKeys.InvalidKey))
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
 
-        string sourceDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.src.dir"));
+        string sourceDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey(ProjectFileKeys.ProjectSourceDirectory));
         if (!Directory.Exists(sourceDir))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
-                "SourcePath-Dir not found.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors);
 
-        string sourceOut = ProjectFile.GetKey("project.src.out");
-        if (sourceOut.Equals(""))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "ProjectFile:project.src.out is not valid.");
+        string sourceOut = ProjectFile.GetKey(ProjectFileKeys.ProjectOutputFilename);
+        if (sourceOut.Equals(ProjectFileKeys.InvalidKey))
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
 
-        string outDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey("project.out.dir"));
+        string outDir = Path.Combine(ProjectFile.SourceFile.DirectoryName, ProjectFile.GetKey(ProjectFileKeys.ProjectOutputDirectory));
         if (!Directory.Exists(outDir))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "ProjectOut-Dir not found.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
 
-        string mainFileName = ProjectFile.GetKey("project.src.main");
-        if (mainFileName.Equals(""))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "ProjectFile:project.src.main is not valid.");
+        string mainFileName = ProjectFile.GetKey(ProjectFileKeys.ProjectSourceMainFilename);
+        if (mainFileName.Equals(ProjectFileKeys.InvalidKey))
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
         if (!File.Exists(sourceDir + mainFileName))
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors,
-                "MainSourceFile not found.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithErrors);
 
         // Step 1: Packing Code Files
 
@@ -112,8 +103,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         catch (Exception)
         {
             Logging.Print("Failed to write file!", Logging.PrintLevel.Error);
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors,
-                "SourceOut-File failed to write.");
+            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
         }
 
         // Step 2: Custom Post-Build Commands
@@ -126,7 +116,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         Logging.Print($"Done in {duration.Milliseconds}ms!", Logging.PrintLevel.Info);
 
-        return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors, "Done.");
+        return ProjectBuilderResult.Of(ProjectBuilderResultType.DoneNoErrors);
     }
     
     private void PostBuildCommand()
@@ -157,14 +147,12 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 public class ProjectBuilderResult
 {
     public ProjectBuilderResultType ResultType { get; private set; }
-    public string ResultCauseInformation { get; private set; } = "";
 
-    public static ProjectBuilderResult Of(ProjectBuilderResultType resultType, string resultCauseInformation)
+    public static ProjectBuilderResult Of(ProjectBuilderResultType resultType)
     {
         return new ProjectBuilderResult()
         {
             ResultType = resultType,
-            ResultCauseInformation = resultCauseInformation
         };
     }
 }
