@@ -18,11 +18,6 @@ internal abstract class Program
         }
 
         string file = GetProjectFilename(args);
-        if (!File.Exists(file) || string.IsNullOrEmpty(file) || string.IsNullOrWhiteSpace(file))
-        {
-            Logging.Print($"File {file} is not valid.", Logging.PrintLevel.Error);
-            return;
-        }
 
         try
         {
