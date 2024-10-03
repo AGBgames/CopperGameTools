@@ -1,3 +1,5 @@
+using CopperGameTools.Shared;
+
 namespace CopperGameTools.Builder;
 
 public class ProjectFile
@@ -28,7 +30,7 @@ public class ProjectFile
     {
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (!line.Contains('=') || line.StartsWith('#') || !IsValidString(line)) continue;
+            if (!line.Contains('=') || line.StartsWith('#') || !Utils.IsValidString(line)) continue;
             string[] split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1]));
         }
@@ -36,32 +38,25 @@ public class ProjectFile
 
     public string GetKey(string searchKey)
     {
-        if (!IsValidString(searchKey)) return ProjectFileKeys.InvalidKey;
-        foreach (ProjectFileKey key in FileKeys)
-        {
-            if (key.Key != searchKey) continue;
-            if (!key.Value.Contains('$')) return key.Value;
-            string[] split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
-            foreach (string t in split)
-            {
-                string temp = GetKey(t);
-                if (string.IsNullOrEmpty(temp)) continue;
-                key.Value = temp;
-            }
-            return key.Value;
-        }
-        return "";
+        if (!Utils.IsValidString(searchKey)) 
+            return ProjectFileKeys.InvalidKey;
+        ProjectFileKey? keyFound = FileKeys.Find(x => x.Key == searchKey);
+        if (keyFound == null)
+            return ProjectFileKeys.InvalidKey;
+        if (!keyFound.Value.Contains('$'))
+            return keyFound.Value;
+        string[] split = keyFound.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
+        string tempValue = GetKey(split[0]);
+        if (!Utils.IsValidString(tempValue)) 
+            return ProjectFileKeys.InvalidKey;
+        keyFound.Value = tempValue;
+        return keyFound.Value;
     }
 
     public bool GetKeyAsBoolean(string searchKey, bool defaultValue)
     {
         string key = GetKey(searchKey);
         return key != "" ? Convert.ToBoolean(key) : defaultValue;
-    }
-
-    private static bool IsValidString(string searchKey)
-    {
-        return !string.IsNullOrEmpty(searchKey) && !string.IsNullOrWhiteSpace(searchKey);
     }
 
     /// <summary>
@@ -77,7 +72,7 @@ public class ProjectFile
         var readKeys = new List<ProjectFileKey>();
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (!IsValidString(line) || line.StartsWith($"#"))
+            if (!Utils.IsValidString(line) || line.StartsWith($"#"))
             {
                 lineNumber++;
                 continue;
