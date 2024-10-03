@@ -11,7 +11,7 @@ public class ProjectFile
     {
         if (!sourceFile.Exists)
         {
-            SourceFile = new FileInfo("");
+            SourceFile = new FileInfo("error");
             FileKeys = [];
             Logging.Print($"The project file {sourceFile} does not exists / could not be found! Aborting.", Logging.PrintLevel.Error);
             return;
@@ -40,7 +40,8 @@ public class ProjectFile
     {
         if (!Utils.IsValidString(searchKey)) 
             return ProjectFileKeys.InvalidKey;
-        ProjectFileKey? keyFound = FileKeys.Find(x => x.Key == searchKey);
+        ProjectFileKey? keyFound = 
+            FileKeys.Find(x => x.Key == searchKey);
         if (keyFound == null)
             return ProjectFileKeys.InvalidKey;
         if (!keyFound.Value.Contains('$'))
@@ -96,10 +97,9 @@ public class ProjectFile
             var keyToAdd = new ProjectFileKey(
                 keySplit[0],
                 keySplit[1]);
-
-            foreach (ProjectFileKey key in readKeys)
+            
+            foreach (ProjectFileKey unused in readKeys.Where(key => key.Key == keyToAdd.Key))
             {
-                if (key.Key != keyToAdd.Key) continue;
                 errors.Add(
                     new ProjectFileCheckError(ProjectFileCheckErrorType.DuplicatedKey, $"[{lineNumber}] {line}"));
                 lineNumber++;
