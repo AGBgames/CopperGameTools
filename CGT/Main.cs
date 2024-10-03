@@ -49,10 +49,12 @@ internal abstract class Program
 
     private static string GetProjectFilename(string[] args)
     {
-        if (args.Length >= 2) return args[1];
+        if (args.Length >= 2) 
+            return args[1];
         string[] files = Directory.GetFiles("./", "*.cgt");
-        if (files.Length != 0) return files[0];
-        Logging.Print("No project file found.", Logging.PrintLevel.Info);
+        if (files.Length != 0) 
+            return files[0];
+        Logging.Print("No project file found. Is there a .cgt-File in the current directory?", Logging.PrintLevel.Info);
         return "";
     }
 
