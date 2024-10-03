@@ -1,9 +1,19 @@
 ﻿namespace CopperGameTools.Builder;
 
+/// <summary>
+/// Logging utility class.
+/// </summary>
 public abstract class Logging
 {
+    /// <summary>
+    /// Holds the current log string. 
+    /// </summary>
     private static string Log { get; set; } = "";
     
+    /// <summary>
+    /// Prints projectfile errors in a format.
+    /// </summary>
+    /// <param name="projectFileCheckResult">The ProjectFileCheckResults which will provide the list of errors to print.</param>
     public static void PrintErrors(ProjectFileCheckResult projectFileCheckResult)
     {
         if (projectFileCheckResult.ResultErrors.Count == 0)
@@ -18,6 +28,9 @@ public abstract class Logging
         }
     }
 
+    /// <summary>
+    /// All the different logging levels.
+    /// </summary>
     public enum PrintLevel
     {
         Info,
@@ -25,10 +38,15 @@ public abstract class Logging
         Error
     }
     
+    /// <summary>
+    /// Print and append to log string.
+    /// </summary>
+    /// <param name="message">What to print.</param>
+    /// <param name="printLevel">Log level of the message.</param>
     public static void Print(string message, PrintLevel printLevel)
     {
         DateTime now = DateTime.Now;
-        string time = now.ToString("hh:mm");
+        string time = now.ToString("HH:mm");
 
         string fullMessage;
         
@@ -54,6 +72,10 @@ public abstract class Logging
         Console.ResetColor();
     }
 
+    /// <summary>
+    /// Write the log string to a file.
+    /// </summary>
+    /// <param name="filename">Filename for the log file.</param>
     public static void WriteLog(string filename)
     {
         if (!Directory.Exists("./.cgt/"))
