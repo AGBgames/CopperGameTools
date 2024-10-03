@@ -28,7 +28,7 @@ public class ProjectFile
     {
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (!line.Contains('=') || line.StartsWith('#') || string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)) continue;
+            if (!line.Contains('=') || line.StartsWith('#') || !IsValidString(line)) continue;
             string[] split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1]));
         }
@@ -36,7 +36,7 @@ public class ProjectFile
 
     public string GetKey(string searchKey)
     {
-        if (string.IsNullOrEmpty(searchKey)) return "";
+        if (!IsValidString(searchKey)) return ProjectFileKeys.InvalidKey;
         foreach (ProjectFileKey key in FileKeys)
         {
             if (key.Key != searchKey) continue;
@@ -44,8 +44,9 @@ public class ProjectFile
             string[] split = key.Value.Split('$', StringSplitOptions.RemoveEmptyEntries);
             foreach (string t in split)
             {
-                if (string.IsNullOrEmpty(GetKey(t))) continue;
-                key.Value = GetKey(t);
+                string temp = GetKey(t);
+                if (string.IsNullOrEmpty(temp)) continue;
+                key.Value = temp;
             }
             return key.Value;
         }
@@ -56,6 +57,11 @@ public class ProjectFile
     {
         string key = GetKey(searchKey);
         return key != "" ? Convert.ToBoolean(key) : defaultValue;
+    }
+
+    private static bool IsValidString(string searchKey)
+    {
+        return !string.IsNullOrEmpty(searchKey) && !string.IsNullOrWhiteSpace(searchKey);
     }
 
     /// <summary>
@@ -71,7 +77,7 @@ public class ProjectFile
         var readKeys = new List<ProjectFileKey>();
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line) || line.StartsWith($"#"))
+            if (!IsValidString(line) || line.StartsWith($"#"))
             {
                 lineNumber++;
                 continue;
@@ -109,7 +115,7 @@ public class ProjectFile
         }
 
         return errors.Count > 0 ? new ProjectFileCheckResult(CgtProjectFileCheckResultType.Errors, errors)
-            : new ProjectFileCheckResult(CgtProjectFileCheckResultType.NoErrors, new List<ProjectFileCheckError>());
+            : new ProjectFileCheckResult(CgtProjectFileCheckResultType.NoErrors, []);
     }
 }
 
