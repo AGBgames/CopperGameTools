@@ -57,7 +57,7 @@ public class ProjectFile
     public bool GetKeyAsBoolean(string searchKey, bool defaultValue)
     {
         string key = GetKey(searchKey);
-        return key != "" ? Convert.ToBoolean(key) : defaultValue;
+        return Utils.IsValidString(key) ? Convert.ToBoolean(key) : defaultValue;
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class ProjectFile
         var readKeys = new List<ProjectFileKey>();
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (!Utils.IsValidString(line) || line.StartsWith($"#"))
+            if (!Utils.IsValidString(line) || line.StartsWith('#'))
             {
                 lineNumber++;
                 continue;
@@ -86,7 +86,7 @@ public class ProjectFile
                 continue;
             }
 
-            if (line.Split('=')[1] == "")
+            if (!Utils.IsValidString(line.Split('=')[1]))
             {
                 errors.Add(new ProjectFileCheckError(ProjectFileCheckErrorType.InvalidValue, $"[{lineNumber}] {line}"));
                 lineNumber++;
@@ -94,9 +94,7 @@ public class ProjectFile
             }
 
             string[] keySplit = line.Split('=');
-            var keyToAdd = new ProjectFileKey(
-                keySplit[0],
-                keySplit[1]);
+            var keyToAdd = new ProjectFileKey(keySplit[0], keySplit[1]);
             
             foreach (ProjectFileKey unused in readKeys.Where(key => key.Key == keyToAdd.Key))
             {
