@@ -137,6 +137,6 @@ internal abstract class Program
                 Logging.Print($"Output directory: {outDir}", Logging.PrintLevel.Info);
         }
         
-        Logging.WriteLog(CopperGameToolsInfo.BuildLogFilename);
+        Logging.WriteLog(CopperGameToolsInfo.InfoLogFilename);
     }
 }
