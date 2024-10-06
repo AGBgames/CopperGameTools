@@ -17,7 +17,7 @@ internal abstract class Program
             return;
         }
 
-        string file = GetProjectFilename(args);
+        var filename = new Const<string>(GetProjectFilename(args));
 
         try
         {
@@ -25,25 +25,25 @@ internal abstract class Program
             {
                 case "build":
                 case "b":
-                    HandleBuild(file);
+                    HandleBuild(filename.Value);
                     break;
                 case "check":
                 case "c":
-                    HandleCheck(file);
+                    HandleCheck(filename.Value);
                     break;
                 case "info":
                 case "i":
-                    HandleInfo(file);
+                    HandleInfo(filename.Value);
                     break;
             }
         }
         catch (FileNotFoundException)
         {
-            Logging.Print($"File {file} not found.", Logging.PrintLevel.Error);
+            Logging.Print($"File {filename.Value} not found.", Logging.PrintLevel.Error);
         }
         catch (UnauthorizedAccessException)
         {
-            Logging.Print($"Failed to access {file}", Logging.PrintLevel.Error);
+            Logging.Print($"Failed to access {filename.Value}", Logging.PrintLevel.Error);
         }
     }
 

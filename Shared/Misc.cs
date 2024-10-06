@@ -13,7 +13,7 @@ public abstract class Utils
     }
 }
 
-public class ConstantValue<T>(T value)
+public class Const<T>(T value)
 {
     public readonly T Value = value;
 }
