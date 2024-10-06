@@ -30,12 +30,17 @@ public class ProjectFile
     {
         foreach (string line in File.ReadAllLines(SourceFile.FullName))
         {
-            if (!line.Contains('=') || line.StartsWith('#') || !Utils.IsValidString(line)) continue;
+            if (!Utils.IsValidString(line) || !line.Contains('=') || line.StartsWith('#')) continue;
             string[] split = line.Split("=");
             FileKeys.Add(new ProjectFileKey(split[0], split[1]));
         }
     }
 
+    /// <summary>
+    /// Looks for the key with the specified name and returns its value if found.
+    /// </summary>
+    /// <param name="searchKey">Name of the key to search for.</param>
+    /// <returns>Value of key.</returns>
     public string GetKey(string searchKey)
     {
         if (!Utils.IsValidString(searchKey)) 
@@ -54,7 +59,25 @@ public class ProjectFile
         return keyFound.Value;
     }
 
-    public bool GetKeyAsBoolean(string searchKey, bool defaultValue)
+    /// <summary>
+    /// Same as GetKey(), but converts value to int.
+    /// </summary>
+    /// <param name="searchKey">Name of the key to search for.</param>
+    /// <param name="defaultValue">The default value to return if key is not found.</param>
+    /// <returns>Value of key as an int or the default value.</returns>
+    public int GetKeyAsInt(string searchKey, int defaultValue = 0)
+    {
+        string key = GetKey(searchKey);
+        return Utils.IsValidString(key) ? Convert.ToInt32(key) : defaultValue;
+    }
+
+    /// <summary>
+    /// Same as GetKey(), but converts value to boolean.
+    /// </summary>
+    /// <param name="searchKey">Name of the key to search for.</param>
+    /// <param name="defaultValue">The default value to return if key is not found.</param>
+    /// <returns>Value of key as an boolean or the default value.</returns>
+    public bool GetKeyAsBoolean(string searchKey, bool defaultValue = false)
     {
         string key = GetKey(searchKey);
         return Utils.IsValidString(key) ? Convert.ToBoolean(key) : defaultValue;

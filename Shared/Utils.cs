@@ -12,3 +12,8 @@ public abstract class Utils
         return !string.IsNullOrEmpty(str) && !string.IsNullOrWhiteSpace(str);
     }
 }
+
+public class ConstantValue<T>(T value)
+{
+    public readonly T Value = value;
+}
