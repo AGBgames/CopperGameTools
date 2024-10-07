@@ -68,7 +68,7 @@ public class ProjectFile
     public int GetKeyAsInt(string searchKey, int defaultValue = 0)
     {
         string key = GetKey(searchKey);
-        return Utils.IsValidString(key) ? Convert.ToInt32(key) : defaultValue;
+        return Utils.IsValidString(ref key) ? Convert.ToInt32(key) : defaultValue;
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class ProjectFile
     public bool GetKeyAsBoolean(string searchKey, bool defaultValue = false)
     {
         string key = GetKey(searchKey);
-        return Utils.IsValidString(key) ? Convert.ToBoolean(key) : defaultValue;
+        return Utils.IsValidString(ref key) ? Convert.ToBoolean(key) : defaultValue;
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public class ProjectFile
                 continue;
             }
 
-            if (!Utils.IsValidString(line.Split('=')[1]))
+            if (!Utils.IsValidString(ref line.Split('=')[1]))
             {
                 errors.Add(new ProjectFileCheckError(ProjectFileCheckErrorType.InvalidValue, $"[{lineNumber}] {line}"));
                 lineNumber++;

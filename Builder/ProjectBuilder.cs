@@ -18,7 +18,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         Logging.Print($"Building with CopperGameTools v{CopperGameToolsInfo.Version}", Logging.PrintLevel.Info);
 
         string version = ProjectFile.GetKey(ProjectFileKeys.BuilderVersion);
-        bool versionRequired = ProjectFile.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion, false);
+        bool versionRequired = ProjectFile.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion);
 
         if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && !versionRequired)
         {
@@ -108,7 +108,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         // Step 2: Custom Post-Build Commands
         Logging.Print($"STEP 2: Running post-build commands:", Logging.PrintLevel.Info);
-        if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled", false))
+        if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
             PostBuildCommand();
         
         DateTime end = DateTime.Now;

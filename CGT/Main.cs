@@ -109,7 +109,7 @@ internal abstract class Program
         bool isCompatible = version is CopperGameToolsInfo.Version or CopperGameToolsInfo.MajorVersion;
         if (!version.Equals(ProjectFileKeys.InvalidKey))
             Logging.Print($"Projects CGT Version: {version} | Compatible with installation: {isCompatible}", Logging.PrintLevel.Info);
-        bool requiresVersion = file.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion, false);
+        bool requiresVersion = file.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion);
         Logging.Print($"Requires specific CGT Version: {requiresVersion}", Logging.PrintLevel.Info);
         
         string projectName = file.GetKey(ProjectFileKeys.ProjectName);
