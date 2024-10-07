@@ -18,7 +18,7 @@ internal abstract class Program
         }
 
         var filename = new Const<string>(GetProjectFilename(args));
-
+        
         try
         {
             switch (args[0])

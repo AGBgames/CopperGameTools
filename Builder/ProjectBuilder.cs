@@ -20,16 +20,19 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         string version = ProjectFile.GetKey(ProjectFileKeys.BuilderVersion);
         bool versionRequired = ProjectFile.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion);
 
-        if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && !versionRequired)
+        if (!version.Equals(ProjectFileKeys.InvalidKey))
         {
-            Logging.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
-                Logging.PrintLevel.Warning);
-        }
-        else if ((version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion) && versionRequired)
-        {
-            Logging.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
-                Logging.PrintLevel.Error);
-            return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
+            switch (version != CopperGameToolsInfo.Version && version != CopperGameToolsInfo.MajorVersion)
+            {
+                case true when !versionRequired:
+                    Logging.Print("Project file set for different version of CopperGameTools.\nSupport might be limited.\n",
+                        Logging.PrintLevel.Warning);
+                    break;
+                case true when versionRequired:
+                    Logging.Print("Unable to build due to incompatible versions.\nPlease refer to the project file for more information.",
+                        Logging.PrintLevel.Error);
+                    return ProjectBuilderResult.Of(ProjectBuilderResultType.FailedWithProjectFileErrors);
+            }
         }
         
         if (ProjectFile.SourceFile.DirectoryName == null)
@@ -123,11 +126,11 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     {
         try
         {
-            string value = ProjectFile.GetKey("builder.commands.postbuild");
+            var command = new Const<string>(ProjectFile.GetKey("builder.commands.postbuild"));
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = value,
+                FileName = command.Value,
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true

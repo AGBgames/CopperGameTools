@@ -18,7 +18,7 @@ public abstract class Utils
     /// <returns>Boolean indicating if the string is valid (defined by the rules)</returns>
     public static bool IsValidString(ref string str)
     {
-        return !string.IsNullOrEmpty(str) && IsValidString(str);
+        return IsValidString(str);
     }
 }
 
