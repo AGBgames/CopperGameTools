@@ -30,9 +30,8 @@ public class StrongConstHolder<T>(T value)
 }
 public class WeakConstHolder<T>(T value)
 {
-    [Conditional("")]
     public bool Locked = true;
-
+    
     private T _value = value;
 
     public T Value()
