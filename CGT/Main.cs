@@ -18,9 +18,6 @@ internal abstract class Program
         }
 
         var filename = new StrongConstHolder<string>(GetProjectFilename(args));
-        var weak = new WeakConstHolder<string>(GetProjectFilename(args));
-        weak.Locked = true;
-        weak.Set("test");
         
         try
         {
