@@ -1,4 +1,6 @@
-﻿namespace CopperGameTools.Shared;
+﻿using System.Diagnostics;
+
+namespace CopperGameTools.Shared;
 
 public abstract class Utils
 {
@@ -22,7 +24,27 @@ public abstract class Utils
     }
 }
 
-public class Const<T>(T value)
+public class StrongConstHolder<T>(T value)
 {
     public readonly T Value = value;
+}
+public class WeakConstHolder<T>(T value)
+{
+    [Conditional("")]
+    public bool Locked = true;
+
+    private T _value = value;
+
+    public T Value()
+    {
+        return _value;
+    }
+
+    public void Set(T newValue)
+    {
+        if (_value == null) return;
+        if (Locked)
+            throw new InvalidOperationException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
+        _value = newValue;
+    }
 }

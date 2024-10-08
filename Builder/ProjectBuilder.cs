@@ -126,7 +126,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     {
         try
         {
-            var command = new Const<string>(ProjectFile.GetKey("builder.commands.postbuild"));
+            var command = new StrongConstHolder<string>(ProjectFile.GetKey("builder.commands.postbuild"));
 
             var startInfo = new ProcessStartInfo
             {
