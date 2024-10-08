@@ -34,16 +34,15 @@ public class WeakConstHolder<T>(T value)
     
     private T _value = value;
 
-    public T Value()
-    {
-        return _value;
-    }
+    public T Value() => _value;
 
     public void Set(T newValue)
     {
         if (_value == null) return;
         if (Locked)
-            throw new InvalidOperationException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
+            throw new WeakConstHolderLockedException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
         _value = newValue;
     }
 }
+
+class WeakConstHolderLockedException(string? message) : Exception(message);
