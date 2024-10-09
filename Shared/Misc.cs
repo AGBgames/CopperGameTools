@@ -24,6 +24,8 @@ public abstract class Utils
     }
 }
 
+// Pretty weird and useless, but why not:
+
 public class StrongConstHolder<T>(T value)
 {
     public readonly T Value = value;
