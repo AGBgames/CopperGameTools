@@ -126,11 +126,11 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     {
         try
         {
-            var command = new StrongConstHolder<string>(ProjectFile.GetKey("builder.commands.postbuild"));
+            var command = new StrongReadOnlyHolder<string>(ProjectFile.GetKey("builder.commands.postbuild"));
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = command.Value,
+                FileName = command.Value(),
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true

@@ -17,7 +17,7 @@ internal abstract class Program
             return;
         }
 
-        var filename = new StrongConstHolder<string>(GetProjectFilename(args));
+        var filename = new StrongReadOnlyHolder<string>(GetProjectFilename(args));
         
         try
         {
@@ -25,15 +25,15 @@ internal abstract class Program
             {
                 case "build":
                 case "b":
-                    HandleBuild(filename.Value);
+                    HandleBuild(filename.Value());
                     break;
                 case "check":
                 case "c":
-                    HandleCheck(filename.Value);
+                    HandleCheck(filename.Value());
                     break;
                 case "info":
                 case "i":
-                    HandleInfo(filename.Value);
+                    HandleInfo(filename.Value());
                     break;
             }
         }

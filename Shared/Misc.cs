@@ -24,20 +24,33 @@ public abstract class Utils
 
 // Pretty weird and useless, but why not:
 
-public class StrongConstHolder<T>(T value)
+/// <summary>
+/// Holds a readonly value.
+/// </summary>
+/// <typeparam name="T">Type of the readonly value.</typeparam>
+/// <param name="value">Value of the readonly value.</param>
+public class StrongReadOnlyHolder<T>(T value)
 {
-    public readonly T Value = value;
+    private readonly T _value = value;
+
+    public T Value() => _value;
 }
-public class WeakConstHolder<T>(T value)
+/// <summary>
+/// Holds a value that can only be changed if the WeakReadOnlyHolder is "unlocked".
+/// </summary>
+/// <typeparam name="T">Type of the value.</typeparam>
+/// <param name="value">Value of the value.</param>
+public class WeakReadOnlyHolder<T>(T value)
 {
-    public bool Locked = true;
     private T _value = value;
 
+    public bool Locked = true;
     public T Value() => _value;
 
     public void Set(T newValue)
     {
-        if (_value == null) return;
+        if (_value == null) 
+            return;
         if (Locked)
             throw new WeakConstHolderLockedException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
         _value = newValue;
