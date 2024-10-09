@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace CopperGameTools.Shared;
+﻿namespace CopperGameTools.Shared;
 
 public abstract class Utils
 {
@@ -33,7 +31,6 @@ public class StrongConstHolder<T>(T value)
 public class WeakConstHolder<T>(T value)
 {
     public bool Locked = true;
-    
     private T _value = value;
 
     public T Value() => _value;
