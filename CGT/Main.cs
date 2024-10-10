@@ -6,7 +6,7 @@ namespace CopperGameTools.CGT;
 
 internal abstract class Program
 {
-    private static readonly List<ICommand> _commands = [new BuildCommand()];
+    private static readonly List<ICommand> _commands = [new BuildCommand(), new CheckCommand(), new InfoCommand()];
 
     public static void Main(string[] args)
     {

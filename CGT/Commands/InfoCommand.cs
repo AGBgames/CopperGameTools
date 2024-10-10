@@ -12,7 +12,7 @@ namespace CopperGameTools.CGT.Commands
 
         public string Alias()
         {
-            return "c";
+            return "i";
         }
 
         public bool Execute(string filename)
