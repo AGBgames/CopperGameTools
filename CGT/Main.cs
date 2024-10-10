@@ -21,14 +21,14 @@ internal abstract class Program
         }
 
         var filename = new StrongReadOnlyHolder<string>(GetProjectFilename(args));
-        var commandParameter = new StrongReadOnlyHolder<string>(args[0]);
+        var usedCommandParameter = new StrongReadOnlyHolder<string>(args[0]);
         
         try
         {
             var command = _commands
                 .Where(command =>
-                string.Equals(command.Parameter(), commandParameter.Value(), StringComparison.OrdinalIgnoreCase)
-                || string.Equals(command.Alias(), commandParameter.Value(), StringComparison.OrdinalIgnoreCase))
+                string.Equals(command.Parameter(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase)
+                || string.Equals(command.Alias(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (command != null)
@@ -56,7 +56,7 @@ internal abstract class Program
         if (args.Length >= 2) 
             return args[1];
         string[] files = Directory.GetFiles("./", "*.cgt");
-        if (files.Length != 0) 
+        if (files.Length != 0)
             return files[0];
         Logging.Print("No project file found. Is there a .cgt-File in the current directory?", Logging.PrintLevel.Info);
         return "";

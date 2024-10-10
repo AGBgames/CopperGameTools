@@ -7,11 +7,13 @@
         /// </summary>
         /// <returns>Command parameter string.</returns>
         string Parameter();
+
         /// <summary>
         /// Alias of the command parameter (e.g. for "build" it would be "b").
         /// </summary>
         /// <returns>Command parameter alias string.</returns>
         string Alias();
+
         /// <summary>
         /// Method defining what the command does.
         /// </summary>
