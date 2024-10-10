@@ -1,3 +1,4 @@
+using CopperGameTools.CGT.Commands;
 using CopperGameTools.Builder;
 using CopperGameTools.Shared;
 
@@ -5,6 +6,8 @@ namespace CopperGameTools.CGT;
 
 internal abstract class Program
 {
+    private static readonly List<ICommand> _commands = [new BuildCommand()];
+
     public static void Main(string[] args)
     {
         if (args.Length == 0)
@@ -18,32 +21,33 @@ internal abstract class Program
         }
 
         var filename = new StrongReadOnlyHolder<string>(GetProjectFilename(args));
+        var commandParameter = new StrongReadOnlyHolder<string>(args[0]);
         
         try
         {
-            switch (args[0])
+            var command = _commands
+                .Where(command =>
+                string.Equals(command.Parameter(), commandParameter.Value(), StringComparison.OrdinalIgnoreCase)
+                || string.Equals(command.Alias(), commandParameter.Value(), StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+
+            if (command != null)
             {
-                case "build":
-                case "b":
-                    HandleBuild(filename.Value());
-                    break;
-                case "check":
-                case "c":
-                    HandleCheck(filename.Value());
-                    break;
-                case "info":
-                case "i":
-                    HandleInfo(filename.Value());
-                    break;
+                //TODO: Use return bool.
+                command.Execute(filename.Value());
+            }
+            else
+            {
+                Logging.Print("Command not found.", Logging.PrintLevel.Warning);
             }
         }
         catch (FileNotFoundException)
         {
-            Logging.Print($"File {filename.Value} not found.", Logging.PrintLevel.Error);
+            Logging.Print($"File {filename.Value()} not found.", Logging.PrintLevel.Error);
         }
         catch (UnauthorizedAccessException)
         {
-            Logging.Print($"Failed to access {filename.Value}", Logging.PrintLevel.Error);
+            Logging.Print($"Failed to access {filename.Value()}", Logging.PrintLevel.Error);
         }
     }
 
@@ -56,87 +60,5 @@ internal abstract class Program
             return files[0];
         Logging.Print("No project file found. Is there a .cgt-File in the current directory?", Logging.PrintLevel.Info);
         return "";
-    }
-
-    private static void HandleBuild(string filename)
-    {
-        ProjectBuilder builder = new(new ProjectFile(new FileInfo(filename)));
-        ProjectFileCheckResult check = builder.ProjectFile.CheckProjectFile();
-        ProjectBuilderResult result = builder.Build();
-        switch (result.ResultType)
-        {
-            case ProjectBuilderResultType.DoneNoErrors:
-                break;
-            case ProjectBuilderResultType.FailedWithErrors:
-                Logging.PrintErrors(check);
-                break;
-            case ProjectBuilderResultType.FailedWithProjectFileErrors:
-                Logging.PrintErrors(check);
-                break;
-            default:
-                Logging.Print("Detected an unexpected behaviour.", Logging.PrintLevel.Warning);
-                Logging.PrintErrors(check);
-                break;
-        }
-        
-        Logging.WriteLog(CopperGameToolsInfo.BuildLogFilename);
-    }
-
-    private static void HandleCheck(string filename)
-    {
-        ProjectFileCheckResult check = 
-            new ProjectFile(new FileInfo (filename)).CheckProjectFile();
-        Logging.PrintErrors(check);
-        
-        Logging.Print($"Check result: {check.ResultType.ToString()}", Logging.PrintLevel.Info);
-        
-        Logging.WriteLog(CopperGameToolsInfo.CheckLogFilename);
-    }
-
-    private static void HandleInfo(string filename)
-    {
-        Logging.Print($"Reading project file {filename}", Logging.PrintLevel.Info);
-        var file = new ProjectFile(new FileInfo(filename));
-        if (file.SourceFile.DirectoryName == null)
-        {
-            Logging.Print($"Directory of {file} is null", Logging.PrintLevel.Error);
-            return;
-        }
-        Logging.Print("Checking project file: ", Logging.PrintLevel.Info);
-        Logging.PrintErrors(file.CheckProjectFile());
-        
-        string version = file.GetKey(ProjectFileKeys.BuilderVersion);
-        bool isCompatible = version is CopperGameToolsInfo.Version or CopperGameToolsInfo.MajorVersion;
-        if (!version.Equals(ProjectFileKeys.InvalidKey))
-            Logging.Print($"Projects CGT Version: {version} | Compatible with installation: {isCompatible}", Logging.PrintLevel.Info);
-        bool requiresVersion = file.GetKeyAsBoolean(ProjectFileKeys.BuilderRequireVersion);
-        Logging.Print($"Requires specific CGT Version: {requiresVersion}", Logging.PrintLevel.Info);
-        
-        string projectName = file.GetKey(ProjectFileKeys.ProjectName);
-        if (!projectName.Equals(ProjectFileKeys.InvalidKey))
-            Logging.Print($"Project name: {projectName}", Logging.PrintLevel.Info);
-        
-        string sourceDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectSourceDirectory));
-        if (!sourceDir.Equals(ProjectFileKeys.InvalidKey))
-        {
-            if (Directory.Exists(sourceDir))
-                Logging.Print($"Source directory: {sourceDir}", Logging.PrintLevel.Info);
-        }
-        
-        string sourceOut = file.GetKey(ProjectFileKeys.ProjectOutputFilename);
-        if (!sourceOut.Equals(ProjectFileKeys.InvalidKey))
-        {
-            if (File.Exists(sourceOut))
-                Logging.Print($"Output name: {sourceOut}", Logging.PrintLevel.Info);
-        }
-        
-        string outDir = Path.Combine(file.SourceFile.DirectoryName, file.GetKey(ProjectFileKeys.ProjectOutputDirectory));
-        if (!outDir.Equals(ProjectFileKeys.InvalidKey))
-        {
-            if (Directory.Exists(outDir))
-                Logging.Print($"Output directory: {outDir}", Logging.PrintLevel.Info);
-        }
-        
-        Logging.WriteLog(CopperGameToolsInfo.InfoLogFilename);
     }
 }

@@ -52,9 +52,9 @@ public class WeakReadOnlyHolder<T>(T value)
         if (_value == null) 
             return;
         if (Locked)
-            throw new WeakConstHolderLockedException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
+            throw new WeakReadOnlyHolderLockedException($"Trying to update value of locked WeakConst<{_value.GetType().Name}>");
         _value = newValue;
     }
 }
 
-class WeakConstHolderLockedException(string? message) : Exception(message);
+class WeakReadOnlyHolderLockedException(string? message) : Exception(message);
