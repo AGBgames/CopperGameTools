@@ -33,8 +33,8 @@ internal abstract class Program
 
             if (command != null)
             {
-                //TODO: Use return bool.
-                command.Execute(filename.Value());
+                if (!command.Execute(filename.Value()))
+                    Logging.Print("The proccess was ended unexpectedly.", Logging.PrintLevel.Warning);
             }
             else
             {
