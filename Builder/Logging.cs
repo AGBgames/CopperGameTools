@@ -1,5 +1,7 @@
 ﻿namespace CopperGameTools.Builder;
 
+//TODO: move Logging into Shared Project
+
 /// <summary>
 /// Logging utility class.
 /// </summary>
