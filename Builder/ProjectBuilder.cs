@@ -66,7 +66,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         // Step 1: Packing Code Files
 
-        Logging.Print($"STEP 1: Packing JavaScript Code into {sourceOut}.js:",
+        Logging.Print($"STEP 1: Packing Code into {sourceOut}:",
             Logging.PrintLevel.Info);
 
         string toPutInOutputFile = $"// Generated using CopperGameTools v{CopperGameToolsInfo.Version} //\n";
@@ -75,9 +75,13 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         foreach (ProjectFileKey key in ProjectFile.FileKeys)
             toPutInOutputFile += $"ccbSetCopperCubeVariable('{key.Key}','{key.Value}');\n";
 
-        List<string> sourceFileList
-            = [.. Directory.GetFiles(sourceDir, "*.js", SearchOption.AllDirectories)];
         string mainFile = sourceDir + mainFileName;
+        string mainFileExtension = new FileInfo(mainFile).Extension;
+
+        Logging.Print("Looking for " + mainFileExtension + "files in " + sourceDir, Logging.PrintLevel.Info);
+        
+        List<string> sourceFileList
+            = [.. Directory.GetFiles(sourceDir, "*" + mainFileExtension, SearchOption.AllDirectories)];
         sourceFileList.Remove(mainFile);
 
         foreach (string file in sourceFileList)
@@ -100,8 +104,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         // create .js file with all the code
         try
         {
-            File.WriteAllText(outDir + sourceOut + ".js", toPutInOutputFile);
-            Logging.Print($"Wrote Packed Source to {outDir + sourceOut + ".js"}\n", Logging.PrintLevel.Info);
+            File.WriteAllText(outDir + sourceOut + mainFileExtension, toPutInOutputFile);
+            Logging.Print($"Wrote Packed Source to {outDir + sourceOut + "." + mainFileExtension}\n", Logging.PrintLevel.Info);
         }
         catch (Exception)
         {
