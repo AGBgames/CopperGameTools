@@ -78,7 +78,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         string mainFile = sourceDir + mainFileName;
         string mainFileExtension = new FileInfo(mainFile).Extension;
 
-        Logging.Print("Looking for " + mainFileExtension + "files in " + sourceDir, Logging.PrintLevel.Info);
+        Logging.Print("Looking for " + mainFileExtension + " files in " + sourceDir, Logging.PrintLevel.Info);
         
         List<string> sourceFileList
             = [.. Directory.GetFiles(sourceDir, "*" + mainFileExtension, SearchOption.AllDirectories)];
@@ -105,7 +105,7 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         try
         {
             File.WriteAllText(outDir + sourceOut + mainFileExtension, toPutInOutputFile);
-            Logging.Print($"Wrote Packed Source to {outDir + sourceOut + "." + mainFileExtension}\n", Logging.PrintLevel.Info);
+            Logging.Print($"Wrote Packed Source to {outDir + sourceOut + mainFileExtension}\n", Logging.PrintLevel.Info);
         }
         catch (Exception)
         {
