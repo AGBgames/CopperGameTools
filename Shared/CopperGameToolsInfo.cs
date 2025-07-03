@@ -2,8 +2,8 @@
 
 public static class CopperGameToolsInfo
 {
-    public const string MajorVersion = "1.3.*";
-    public const string Version = "1.3.1";
+    public const string MajorVersion = "1.4.*";
+    public const string Version = "1.4.1";
     public const string SupportedCopperCubeVersion = "6.7";
     public const string BuildDate = "08.01.2025 [DD.MM.YY]";
 
