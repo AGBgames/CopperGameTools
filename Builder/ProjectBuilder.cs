@@ -80,14 +80,15 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         string mainFile = sourceDir + mainFileName;
         string mainFileExtension = new FileInfo(mainFile).Extension;
-        
-        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/lib", "*.ts", SearchOption.AllDirectories))
+
+        if (!ProjectFile.GetKeyAsBoolean("project.nolib"))
         {
-            string newFilePath = $"{sourceDir}/{new FileInfo(file).Name}";
-            System.Console.WriteLine(newFilePath);
-            if (File.Exists(newFilePath))
-                continue;
-            File.Copy(file, newFilePath);
+            foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/lib", "*.ts", SearchOption.AllDirectories))
+            {
+                string newFilePath = $"{sourceDir}/{new FileInfo(file).Name}";
+                System.Console.WriteLine(newFilePath);
+                File.Copy(file, newFilePath, true);
+            }
         }
 
         Logging.Print("Looking for " + mainFileExtension + " files in " + sourceDir, Logging.PrintLevel.Info);
