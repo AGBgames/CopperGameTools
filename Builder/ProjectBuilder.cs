@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using CopperGameTools.Shared;
 
 namespace CopperGameTools.Builder;
@@ -13,6 +14,8 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     /// <returns>Returns a ProjectBuilderResult.</returns>
     public ProjectBuilderResult Build()
     {
+        
+
         DateTime start = DateTime.Now;
         
         Logging.Print($"Building with CopperGameTools v{CopperGameToolsInfo.Version}", Logging.PrintLevel.Info);
@@ -77,6 +80,15 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         string mainFile = sourceDir + mainFileName;
         string mainFileExtension = new FileInfo(mainFile).Extension;
+        
+        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/lib", "*.ts", SearchOption.AllDirectories))
+        {
+            string newFilePath = $"{sourceDir}/{new FileInfo(file).Name}";
+            System.Console.WriteLine(newFilePath);
+            if (File.Exists(newFilePath))
+                continue;
+            File.Copy(file, newFilePath);
+        }
 
         Logging.Print("Looking for " + mainFileExtension + " files in " + sourceDir, Logging.PrintLevel.Info);
         
