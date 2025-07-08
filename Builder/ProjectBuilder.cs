@@ -86,8 +86,10 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
             foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/lib", "*.ts", SearchOption.AllDirectories))
             {
                 string newFilePath = $"{sourceDir}/{new FileInfo(file).Name}";
+                if (File.Exists(newFilePath))
+                    continue;
                 System.Console.WriteLine(newFilePath);
-                File.Copy(file, newFilePath, true);
+                File.Copy(file, newFilePath);
             }
         }
 
