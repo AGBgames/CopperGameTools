@@ -83,6 +83,9 @@ function UnregisterFrameEvent(func: any): void {
 declare function ccbRegisterKeyUpEvent(funcString: string): void;
 declare function ccbRegisterKeyDownEvent(funcString: string): void;
 
+declare function ccbRegisterMouseUpEvent(funcString: string): void;
+declare function ccbRegisterMouseDownEvent(funcString: string): void;
+
 // ------ FILES -------
 declare function ccbReadFileContent(fileName: string): string;
 function ReadFile(fileName: string): string {
