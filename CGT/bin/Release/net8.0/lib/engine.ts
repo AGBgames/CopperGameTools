@@ -1,5 +1,8 @@
 
-
+declare function ccbGetMousePosX(): any;
+declare function ccbGetMousePosY(): any;
+declare function ccbGetScreenHeight(): any;
+declare function ccbGetScreenWidth(): any;
 
 declare function ccbGetSceneNodeFromName(sceneNodeName: string): any;
 /**
