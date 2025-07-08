@@ -1,4 +1,4 @@
-function isMouseOverButton(node, buttonWidth, buttonHeight) {
+function IsMouseOnButton(node, buttonWidth, buttonHeight) {
     var mouseX = ccbGetMousePosX();
     Log("MouseX: " + mouseX);
     var mouseY = ccbGetMousePosY();
