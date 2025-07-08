@@ -107,6 +107,13 @@ function FileDelete(fileName: string): void {
 function DirectoryCreate(directoryName: string): void {
     system("mkdir " + directoryName, true);
 }
+function DirectoryDelete(directoryName: string): void {
+    system("del " + directoryName, true);
+}
+
+function FileCopy(oldPathpath: string, newFilepath: string): void {
+    system("cp " + oldPathpath + " " + newFilepath, true);
+}
 
 /**
  * Reads an GFF file and returns its containing data in an array.
