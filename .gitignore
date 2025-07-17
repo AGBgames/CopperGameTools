@@ -6,4 +6,8 @@ Shared/bin/
 Shared/obj/
 
 CGT/bin/Debug
+CGT/bin/*.dll
+CGT/bin/*.exe
+CGT/bin/*.json
+CGT/bin/*.pdb
 CGT/obj
