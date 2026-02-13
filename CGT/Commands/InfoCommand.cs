@@ -3,7 +3,7 @@ using CopperGameTools.Shared;
 
 namespace CopperGameTools.CGT.Commands
 {
-    internal class InfoCommand : ICommand
+    class InfoCommand : ICommand
     {
         public string Parameter()
         {

@@ -145,17 +145,17 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
     {
         try
         {
-            var command = new StrongReadOnlyHolder<string>(ProjectFile.GetKey("builder.commands.postbuild"));
+            string command = ProjectFile.GetKey("builder.commands.postbuild");
 
-            var startInfo = new ProcessStartInfo
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = command.Value(),
+                FileName = command,
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
 
-            var process = new Process();
+            Process process = new Process();
             process.StartInfo = startInfo;
             process.Start();
         }

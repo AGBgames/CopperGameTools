@@ -1,6 +1,6 @@
 ﻿namespace CopperGameTools.CGT.Commands
 {
-    internal interface ICommand
+    interface ICommand
     {
         /// <summary>
         /// Parameter of the command (e.g. "build" or "check).

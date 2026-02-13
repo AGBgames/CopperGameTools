@@ -4,7 +4,7 @@ using CopperGameTools.Shared;
 
 namespace CopperGameTools.CGT;
 
-internal abstract class Program
+abstract class Program
 {
     private static readonly List<ICommand> _commands = [new BuildCommand(), new CheckCommand(), new InfoCommand()];
 
@@ -20,21 +20,25 @@ internal abstract class Program
             return;
         }
 
-        var filename = new StrongReadOnlyHolder<string>(GetProjectFilename(args));
-        var usedCommandParameter = new StrongReadOnlyHolder<string>(args[0]);
+        string filename = GetProjectFilename(args);
+        string usedCommandParameter = args[0];
         
         try
         {
-            var command = _commands
-                .Where(command =>
-                string.Equals(command.Parameter(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase)
-                || string.Equals(command.Alias(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
+            // ICommand? command = _commands
+            //     .Where(command =>
+            //     string.Equals(command.Parameter(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase)
+            //     || string.Equals(command.Alias(), usedCommandParameter.Value(), StringComparison.OrdinalIgnoreCase))
+            //     .FirstOrDefault();
+            
+            ICommand? command = _commands
+                .FirstOrDefault(command => string.Equals(command.Parameter(), usedCommandParameter, StringComparison.OrdinalIgnoreCase)
+                                           || string.Equals(command.Alias(), usedCommandParameter, StringComparison.OrdinalIgnoreCase));
 
             if (command != null)
             {
-                if (!command.Execute(filename.Value()))
-                    Logging.Print("The proccess was ended unexpectedly.", Logging.PrintLevel.Warning);
+                if (!command.Execute(filename))
+                    Logging.Print("The process was ended unexpectedly.", Logging.PrintLevel.Warning);
             }
             else
             {
@@ -43,11 +47,11 @@ internal abstract class Program
         }
         catch (FileNotFoundException)
         {
-            Logging.Print($"File {filename.Value()} not found.", Logging.PrintLevel.Error);
+            Logging.Print($"File {filename} not found.", Logging.PrintLevel.Error);
         }
         catch (UnauthorizedAccessException)
         {
-            Logging.Print($"Failed to access {filename.Value()}", Logging.PrintLevel.Error);
+            Logging.Print($"Failed to access {filename}", Logging.PrintLevel.Error);
         }
     }
 

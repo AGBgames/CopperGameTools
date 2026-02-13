@@ -25,9 +25,7 @@ namespace CopperGameTools.CGT.Commands
                 case ProjectBuilderResultType.DoneNoErrors:
                     break;
                 case ProjectBuilderResultType.FailedWithErrors:
-                    Logging.PrintErrors(check);
-                    break;
-                case ProjectBuilderResultType.FailedWithProjectFileErrors:
+                case ProjectBuilderResultType.FailedWithProjectFileErrors:    
                     Logging.PrintErrors(check);
                     break;
                 default:

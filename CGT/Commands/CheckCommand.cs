@@ -3,7 +3,7 @@ using CopperGameTools.Shared;
 
 namespace CopperGameTools.CGT.Commands
 {
-    internal class CheckCommand : ICommand
+    class CheckCommand : ICommand
     {
         public string Parameter()
         {
@@ -17,8 +17,7 @@ namespace CopperGameTools.CGT.Commands
 
         public bool Execute(string filename)
         {
-            ProjectFileCheckResult check =
-            new ProjectFile(new FileInfo(filename)).CheckProjectFile();
+            ProjectFileCheckResult check = new ProjectFile(new FileInfo(filename)).CheckProjectFile();
             Logging.PrintErrors(check);
 
             Logging.Print($"Check result: {check.ResultType.ToString()}", Logging.PrintLevel.Info);
