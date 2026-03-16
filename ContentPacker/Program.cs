@@ -1,5 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.IO.Compression;
+
 namespace ContentPacker;
 
 using System.IO;
@@ -7,6 +9,22 @@ using System.Text;
 
 public class ContentPacker
 {
+    public static void Main(string[] args)
+    {
+        if (args.Length < 2)
+            return;
+        
+        string action = args[0];
+        string folderName = args[1];
+        
+
+        if (!Directory.Exists(folderName))
+            return;
+        
+        CreatePackage(folderName + ".gpack", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
+        CreateSimpleArchive(folderName + ".garchive", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
+    }
+    
     public static void CreatePackage(string outputPath, string[] filesToPack)
     {
         using (var fs = new FileStream(outputPath, FileMode.Create))
@@ -49,5 +67,19 @@ public class ContentPacker
                 writer.Write(entry.size);
             }
         }
+    }
+
+    public static void CreateSimpleArchive(string outputPath, string[] filesToPack)
+    {
+        using var zip = new ZipArchive(new FileStream(outputPath, FileMode.Create), ZipArchiveMode.Update);
+        foreach (var file in filesToPack)
+            zip.CreateEntryFromFile(file, file,  CompressionLevel.Optimal);
+    }
+
+    public static void ExtractSimpleArchive(string outputPath, string inputPath)
+    {
+        using var zip = new ZipArchive(new FileStream(inputPath, FileMode.Open), ZipArchiveMode.Update);
+        foreach (var entry in zip.Entries)
+            entry.ExtractToFile(outputPath, true);
     }
 }

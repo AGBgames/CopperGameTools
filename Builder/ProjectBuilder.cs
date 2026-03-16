@@ -133,6 +133,19 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         if (ProjectFile.GetKeyAsBoolean("builder.commands.enabled"))
             PostBuildCommand();
         
+        // Step 3: Game Packs / Game Archives
+        Logging.Print("STEP 3: Packing Resources!", Logging.PrintLevel.Info);
+        if (Directory.Exists("Resource"))
+        {
+            string[] folders = Directory.GetDirectories("Resource", "", SearchOption.TopDirectoryOnly);
+            Logging.Print($"Found {folders.Length} folders in Resource!", Logging.PrintLevel.Info);
+            foreach (string folder in folders)
+            {
+                string[] files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
+                ContentPacker.ContentPacker.CreateSimpleArchive($"{folder}.garchive", files);
+            }
+        }
+        
         DateTime end = DateTime.Now;
         TimeSpan duration = end - start;
 
