@@ -19,15 +19,20 @@ public class Program
 
         if (args.Length == 0)
             return;
+        
+        if (!File.Exists("GameLauncher.txt"))
+            File.WriteAllText("GameLauncher.txt", "");
 
         string what = args[0];
-        if (what == "legacy")
+        switch (what)
         {
-            RunGame();
-        }
-        else if (what == "modded")
-        {
-            RunGameModded();
+            case "legacy":
+                RunGame(File.ReadAllText("GameLauncher.txt"));
+                break;
+            case "modded":
+                RunGameModded();
+                RunGame(File.ReadAllText("GameLauncher.txt"));
+                break;
         }
     }
 
@@ -59,7 +64,9 @@ public class Program
             }
             else if (archive.Contains("_dlc_"))
             {
-                
+                if (!Directory.Exists("TDR3/Mods/"))
+                    Directory.CreateDirectory("TDR3/Mods/");
+                ContentPacker.ContentPacker.ExtractSimpleArchive("TDR3/Mods/", archive);
             }
             
             loadedArchives.Add(archive);
@@ -70,10 +77,10 @@ public class Program
         return loadedArchives;
     }
 
-    private static void RunGame()
+    private static void RunGame(string name)
     {
         Process gameProcess = new Process();
-        gameProcess.StartInfo.FileName = "TheDarkRooms3";
+        gameProcess.StartInfo.FileName = name;
         foreach (string gameArgument in gameArguments)
         {
             gameProcess.StartInfo.ArgumentList.Add(gameArgument);
@@ -115,7 +122,5 @@ public class Program
         gameArguments.Add("-script:");
         gameArguments.Add(Path.Combine(MODS_PATH, "Modded.js"));
         gameArguments.Add("-debug");
-        
-        RunGame();
     }
 }
