@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Builder\Builder.csproj" />
     <ProjectReference Include="..\ContentPacker\ContentPacker.csproj" />
+    <ProjectReference Include="..\GameLauncher\GameLauncher.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 

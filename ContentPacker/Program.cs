@@ -7,7 +7,7 @@ namespace ContentPacker;
 using System.IO;
 using System.Text;
 
-public class ContentPacker
+public static class ContentPacker
 {
     public static void Main(string[] args)
     {
@@ -16,13 +16,31 @@ public class ContentPacker
         
         string action = args[0];
         string folderName = args[1];
-        
-
         if (!Directory.Exists(folderName))
             return;
+
+        switch (action)
+        {
+            case "ma":
+            {
+                CreateSimpleArchive(folderName + ".garchive", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
+                break;
+            }
+            case "ea":
+            {
+                if (args.Length < 3)
+                    return;
+                string inputPath = args[2];
+                
+                ExtractSimpleArchive(folderName, inputPath);
+                break;
+            }
+        }
+
         
-        CreatePackage(folderName + ".gpack", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
-        CreateSimpleArchive(folderName + ".garchive", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
+        
+        //CreatePackage(folderName + ".gpack", Directory.GetFiles(folderName, "*.*",  SearchOption.AllDirectories));
+        
     }
     
     public static void CreatePackage(string outputPath, string[] filesToPack)
@@ -72,14 +90,42 @@ public class ContentPacker
     public static void CreateSimpleArchive(string outputPath, string[] filesToPack)
     {
         using var zip = new ZipArchive(new FileStream(outputPath, FileMode.Create), ZipArchiveMode.Update);
-        foreach (var file in filesToPack)
-            zip.CreateEntryFromFile(file, file,  CompressionLevel.Optimal);
+        foreach (string file in filesToPack)
+        {
+            string entryName = Path.GetRelativePath("Project/Resource/", file);
+            zip.CreateEntryFromFile(file, entryName, CompressionLevel.Optimal);
+        }
     }
 
     public static void ExtractSimpleArchive(string outputPath, string inputPath)
     {
-        using var zip = new ZipArchive(new FileStream(inputPath, FileMode.Open), ZipArchiveMode.Update);
+        using var zip = new ZipArchive(new FileStream(inputPath, FileMode.Open), ZipArchiveMode.Read);
         foreach (var entry in zip.Entries)
-            entry.ExtractToFile(outputPath, true);
+        {
+            string fullPath = Path.GetFullPath(Path.Combine(outputPath, entry.FullName));
+
+            // Sicherheitscheck: Verhindert "Zip Slip" (Dateien außerhalb des Zielordners)
+            if (!fullPath.StartsWith(Path.GetFullPath(outputPath), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new IOException("Ungültiger Pfad im Archiv entdeckt!");
+            }
+
+            // DER ENTSCHEIDENDE SCHRITT:
+            // Den Verzeichnisnamen extrahieren (z.B. Resource\core\textures)
+            string? directoryName = Path.GetDirectoryName(fullPath);
+            
+            if (!string.IsNullOrEmpty(directoryName))
+            {
+                // Erstellt den gesamten Pfadbaum, falls er noch nicht da ist
+                Directory.CreateDirectory(directoryName);
+            }
+
+            // Jetzt kann die Datei sicher extrahiert werden
+            // Prüfen, ob es kein reiner Ordner-Eintrag ist
+            if (!string.IsNullOrEmpty(entry.Name)) 
+            {
+                entry.ExtractToFile(fullPath, overwrite: true);
+            }
+        }
     }
 }

@@ -4,6 +4,8 @@ ContentPacker/bin/
 ContentPacker/obj/
 Shared/bin/
 Shared/obj/
+GameLauncher/bin/
+GameLauncher/obj/
 
 CGT/bin/Debug
 CGT/bin/Release/net8.0/*.dll

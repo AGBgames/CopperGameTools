@@ -135,9 +135,9 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         
         // Step 3: Game Packs / Game Archives
         Logging.Print("STEP 3: Packing Resources!", Logging.PrintLevel.Info);
-        if (Directory.Exists("Resource"))
+        if (Directory.Exists("Project/Resource"))
         {
-            string[] folders = Directory.GetDirectories("Resource", "", SearchOption.TopDirectoryOnly);
+            string[] folders = Directory.GetDirectories("Project/Resource", "", SearchOption.TopDirectoryOnly);
             Logging.Print($"Found {folders.Length} folders in Resource!", Logging.PrintLevel.Info);
             foreach (string folder in folders)
             {
