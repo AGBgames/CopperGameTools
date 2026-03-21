@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Reflection;
+
+using ContentPacker;
+
 using CopperGameTools.Shared;
 
 namespace CopperGameTools.Builder;
@@ -83,8 +86,23 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
 
         if (!ProjectFile.GetKeyAsBoolean("project.nolib"))
         {
+            
+            string libVersionInfoTarget = "";
+            if (File.Exists($"{sourceDir}/libversion.inf"))
+                libVersionInfoTarget = File.ReadAllText($"{sourceDir}/libversion.inf");
+            else
+            {
+                File.WriteAllText($"{sourceDir}/libversion.inf", CopperGameToolsInfo.TypeScriptLibVersion);
+                libVersionInfoTarget = CopperGameToolsInfo.TypeScriptLibVersion;
+            }
+            
             foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/lib", "*.ts", SearchOption.AllDirectories))
             {
+                if (CopperGameToolsInfo.TypeScriptLibVersion == libVersionInfoTarget)
+                {
+                    File.WriteAllText($"{sourceDir}/libversion.inf", CopperGameToolsInfo.TypeScriptLibVersion);
+                    break;
+                }
                 string newFilePath = $"{sourceDir}/{new FileInfo(file).Name}";
                 if (File.Exists(newFilePath))
                     continue;
@@ -137,12 +155,13 @@ public class ProjectBuilder(ProjectFile cgtProjectFile)
         Logging.Print("STEP 3: Packing Resources!", Logging.PrintLevel.Info);
         if (Directory.Exists("Project/Resource"))
         {
+            GArchiveManager gArchiveManager = new GArchiveManager();
             string[] folders = Directory.GetDirectories("Project/Resource", "", SearchOption.TopDirectoryOnly);
             Logging.Print($"Found {folders.Length} folders in Resource!", Logging.PrintLevel.Info);
             foreach (string folder in folders)
             {
                 string[] files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
-                ContentPacker.ContentPacker.CreateSimpleArchive($"{folder}.garchive", files);
+                gArchiveManager.CreateSimpleArchive($"{folder}.garchive", files);
             }
         }
         

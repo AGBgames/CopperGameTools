@@ -1,35 +1,34 @@
-function IsMouseOnButton(node, buttonWidth, buttonHeight) {
-    var mouseX = ccbGetMousePosX();
+
+function IsMouseOnButton(buttonNode: any, buttonWidth: Number, buttonHeight: Number) {
+    const mouseX: Number = ccbGetMousePosX();
     Log("MouseX: " + mouseX);
-    var mouseY = ccbGetMousePosY();
+    const mouseY: Number = ccbGetMousePosY();
     Log("MouseY: " + mouseY);
 
-    var screenWidth = ccbGetScreenWidth();
-    var screenHeight = ccbGetScreenHeight();
+    const screenWidth: Number = ccbGetScreenWidth();
+    const screenHeight: Number = ccbGetScreenHeight();
 
-    // Prozentuale Button-Position abrufen
-    var buttonPosXPercent = ccbGetSceneNodeProperty(node, "Pos X (percent)");
-    var buttonPosYPercent = ccbGetSceneNodeProperty(node, "Pos Y (percent)");
+    const buttonPosXPercent: Number = ccbGetSceneNodeProperty(buttonNode, "Pos X (percent)");
+    const buttonPosYPercent: Number = ccbGetSceneNodeProperty(buttonNode, "Pos Y (percent)");
 
-    // In Pixel umrechnen
-    var buttonX = screenWidth * (buttonPosXPercent / 100.0);
+    const buttonX = screenWidth * (buttonPosXPercent / 100.0);
     Log("buttonX: " + buttonX);
-    var buttonY = screenHeight * (buttonPosYPercent / 100.0);
+    const buttonY = screenHeight * (buttonPosYPercent / 100.0);
     Log("buttonY: " + buttonY);
 
-    var halfWidth = buttonWidth / 2.0;
-    var halfHeight = buttonHeight / 2.0;
+    const halfWidth: Number = buttonWidth / 2.0;
+    const halfHeight: Number = buttonHeight / 2.0;
 
-    var left = buttonX - halfWidth;
-    var right = buttonX + halfWidth;
-    var top = buttonY - halfHeight;
-    var bottom = buttonY + halfHeight;
+    const left: Number = buttonX - halfWidth;
+    const right: Number = buttonX + halfWidth;
+    const top: Number = buttonY - halfHeight;
+    const bottom: Number = buttonY + halfHeight;
 
-    var xDiff = Math.abs(mouseX - buttonX);
-    var yDiff = Math.abs(mouseY - buttonY);
+    const xDiff: Number = Math.abs(mouseX - buttonX);
+    const yDiff: Number = Math.abs(mouseY - buttonY);
 
-    var maxXDiff = screenWidth * 0.5;
-    var maxYDiff = screenHeight * 0.1;
+    const maxXDiff: Number = screenWidth * 0.5;
+    const maxYDiff: Number = screenHeight * 0.1;
 
     return xDiff <= maxXDiff && yDiff <= maxYDiff;
 }

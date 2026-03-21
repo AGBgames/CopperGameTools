@@ -6,6 +6,8 @@ Shared/bin/
 Shared/obj/
 GameLauncher/bin/
 GameLauncher/obj/
+GameExecutable/bin/
+GameExecutable/obj/
 
 CGT/bin/Debug
 CGT/bin/Release/net8.0/*.dll

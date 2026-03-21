@@ -3,6 +3,8 @@
 using System.Diagnostics;
 using System.Text;
 
+using ContentPacker;
+
 public class Program
 {
     private static readonly string GARCHIVE_LIST = "gpacklist.txt";
@@ -16,12 +18,15 @@ public class Program
     {
         List<string> loaded = LoadGameArchives();
         Console.WriteLine("Loaded {0} archives!", loaded.Count);
-
-        if (args.Length == 0)
-            return;
         
         if (!File.Exists("GameLauncher.txt"))
             File.WriteAllText("GameLauncher.txt", "");
+
+        if (args.Length == 0)
+        {
+            RunGame(File.ReadAllText("GameLauncher.txt"));
+            return;
+        }
 
         string what = args[0];
         switch (what)
@@ -46,6 +51,8 @@ public class Program
         }
         
         string[] archives = Directory.GetFiles("./", "*.garchive");
+        
+        GArchiveManager gArchiveManager = new GArchiveManager();
 
         foreach (string archive in archives)
         {
@@ -58,15 +65,22 @@ public class Program
             if (!Directory.Exists("Resource\\"))
                 Directory.CreateDirectory("Resource\\");
 
-            if (archive.Contains("_res_"))
+            string type = "resource";
+            if (File.Exists(archive + ".meta"))
+                type = File.ReadAllText(archive + ".meta");
+
+            switch (type)
             {
-                ContentPacker.ContentPacker.ExtractSimpleArchive("Resource\\", archive);
-            }
-            else if (archive.Contains("_dlc_"))
-            {
-                if (!Directory.Exists("TDR3/Mods/"))
-                    Directory.CreateDirectory("TDR3/Mods/");
-                ContentPacker.ContentPacker.ExtractSimpleArchive("TDR3/Mods/", archive);
+                case "resource":
+                    gArchiveManager.ExtractSimpleArchive("Resource\\", archive);
+                    break;
+                case "mod":
+                {
+                    if (!Directory.Exists("TDR3/Mods/"))
+                        Directory.CreateDirectory("TDR3/Mods/");
+                    gArchiveManager.ExtractSimpleArchive("TDR3/Mods/", archive);
+                    break;
+                }
             }
             
             loadedArchives.Add(archive);

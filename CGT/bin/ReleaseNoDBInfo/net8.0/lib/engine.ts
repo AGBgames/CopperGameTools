@@ -4,6 +4,8 @@ declare function ccbGetMousePosY(): any;
 declare function ccbGetScreenHeight(): any;
 declare function ccbGetScreenWidth(): any;
 
+declare function ccbSwitchToCCBFile(ccbFileName: string): any;
+
 declare function ccbGetSceneNodeFromName(sceneNodeName: string): any;
 /**
  * Gets a SceneNode by name.
@@ -110,6 +112,22 @@ function FileDelete(fileName: string): void {
     ccbFileDelete(fileName);
 }
 
+function LoadFileFromResource(fileName: string) : string | null {
+    const path = "Resource/" + fileName;
+    if (!FileExists(path))
+        return null;
+
+    return ReadFile(path);
+};
+
+function LoadFromFromGArchive(gArchive: string, fileName: string): string | null {
+    const path = "Resource/" + gArchive + "/" +fileName;
+    if (!FileExists(path))
+        return null;
+
+    return ReadFile(path);
+}
+
 /**
  * Copies a source file or directory to a target path.
  * @param oldPathpath Path to source file.
@@ -150,7 +168,7 @@ function printConsole(text: string): void {
     print(text);
 }
 
-declare function ccbDoHTTPRequest(url: string, callback): any;
+declare function ccbDoHTTPRequest(url: string, callback: any): any;
 function DoHTTPRequest(url: string, callback: any): any {
     return ccbDoHTTPRequest(url, callback);
 }

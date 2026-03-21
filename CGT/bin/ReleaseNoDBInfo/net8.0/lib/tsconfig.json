@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES5",               // Setzt das JavaScript-Ziel
+    "module": "none",              // Generiert kein Modul-System (keine `require` oder `export` Anweisungen)
+    "removeComments": true,        // Entfernt Kommentare aus dem generierten JS-Code
+    "outDir": "../Project",            // Gibt den Ausgabeordner für JS-Dateien an
+    "strict": false,               // Deaktiviert strikte Typüberprüfung (optional)
+    "esModuleInterop": false,      // Vermeidet zusätzliche Helper-Funktionen für Imports
+    "noEmitHelpers": true          // Vermeidet Helper-Funktionen in generiertem JS-Code
+  },
+}

@@ -5,14 +5,14 @@ let LogSavePathPreviousLatest: string = `${LogSavePath}prev-latest.log`;
 
 let logString: string = "";
 
-const Log = function (message: string): void {
+function Log(message: string): void {
     const fullMessage =
         new Date().toLocaleString() + `: ${message}\n`;
     logString += fullMessage;
     printConsole(fullMessage);
 }
 
-const SaveLog = function (): void {
+function SaveLog(): void {
     Log("Saving Log.");
     
     if (FileExists(LogSavePathLatest)) {
